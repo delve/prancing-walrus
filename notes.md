@@ -1,1 +1,5 @@
-https://kavitmht.medium.com/discord-bot-in-go-74eabf4090a7
+https://www.gitpod.io/docs/introduction/languages/go#debugging-your-go-application-in-gitpod
+https://github.com/bwmarrin/discordgo
+https://github.com/FedorLap2006/disgolf
+
+
