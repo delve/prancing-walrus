@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	"walrusbot/botcommands"
 
 	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
@@ -61,6 +62,11 @@ func ReadConfig() (err error) {
 		return
 	}
 
+	if config.Token == "BOT_TOKEN" {
+		Log.Infow("token not found in config.json; reading from environment")
+		config.Token = os.Getenv("BOT_TOKEN")
+	}
+
 	return
 }
 
@@ -79,6 +85,7 @@ func main() {
 	defer FastLogger.Sync() // flushes buffer, if any
 
 	bot, err := disgolf.New(config.Token)
+	// bot, err := disgolf.New("fQ9joR5zEH1xKEupw7ylSzivQCtnIoJh")
 	if err != nil {
 		Log.Fatalw("failed to init disgolf", "err", err)
 	}
@@ -116,6 +123,8 @@ func main() {
 			}),
 		},
 	})
+
+	bot.Router.Register(botcommands.MyAssignment)
 
 	bot.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
 		Log.Infow("Bot is up!")
