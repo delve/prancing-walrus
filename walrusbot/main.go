@@ -19,16 +19,19 @@ var (
 	Log        *zap.SugaredLogger
 	FastLogger *zap.Logger
 
-	config *configStruct
+	Config *configStruct
 
 	BotId string
 )
 
 type configStruct struct {
-	Token     string   `json:"Token"`
-	BotPrefix []string `json:"BotPrefix"`
-	AppId     string   `json:"AppId"`
-	ServerId  string   `json:"ServerId"`
+	Token                   string   `json:"Token"`
+	BotPrefix               []string `json:"BotPrefix"`
+	AppId                   string   `json:"AppId"`
+	WarPlanningChannelRegex string   `json:"WarPlanningChannel.regex"`
+	WarPlanningChannelName  string   `json:"WarPlanningChannel.name"`
+	// Only set this if you want to limit the servers the bot talks to
+	ServerId string `json:"ServerId"`
 }
 
 func Check(err error) {
@@ -57,14 +60,14 @@ func ReadConfig() (err error) {
 		return
 	}
 
-	err = json.Unmarshal(file, &config)
+	err = json.Unmarshal(file, &Config)
 	if err != nil {
 		return
 	}
 
-	if config.Token == "BOT_TOKEN" {
+	if Config.Token == "BOT_TOKEN" {
 		Log.Infow("token not found in config.json; reading from environment")
-		config.Token = os.Getenv("BOT_TOKEN")
+		Config.Token = os.Getenv("BOT_TOKEN")
 	}
 
 	return
@@ -84,7 +87,7 @@ func init() {
 func main() {
 	defer FastLogger.Sync() // flushes buffer, if any
 
-	bot, err := disgolf.New(config.Token)
+	bot, err := disgolf.New(Config.Token)
 	// bot, err := disgolf.New("fQ9joR5zEH1xKEupw7ylSzivQCtnIoJh")
 	if err != nil {
 		Log.Fatalw("failed to init disgolf", "err", err)
@@ -140,7 +143,7 @@ func main() {
 		Log.Fatalw("bot open exited with a error", "err", err)
 	}
 	defer bot.Close()
-	err = bot.Router.Sync(bot.Session, config.AppId, config.ServerId)
+	err = bot.Router.Sync(bot.Session, Config.AppId, Config.ServerId)
 	if err != nil {
 		Log.Fatalw("cannot publish commands", "err", err)
 	}

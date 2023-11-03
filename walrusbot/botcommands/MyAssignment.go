@@ -2,6 +2,7 @@ package botcommands
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/FedorLap2006/disgolf"
@@ -16,19 +17,22 @@ var MyAssignment = &disgolf.Command{
 		// fmt.Printf("In Handler CTX: %v\n", ctx)
 		// fmt.Printf("In Handler interaction: %v\n", ctx.Interaction.ChannelID)
 		thisChan, err := ctx.Channel(ctx.Interaction.ChannelID)
+		// TODO: replace this when Check is available everywhere
 		if err != nil {
 			panic(err)
 		}
-		// fmt.Printf("In Handler err: %v\n", err)
+		// TODO: replace this when config is available everywhere
+		match, err := regexp.MatchString("species-war$", thisChan.Name)
+		// match, _ := regexp.MatchString(Config.WarPlanningChannelRegex, thisChan)
+		// TODO: replace this when Check is available everywhere
+		if err != nil {
+			panic(err)
+		}
+
 		fmt.Printf("In Handler channel: %v\n", thisChan.Name)
-		if thisChan.Name == "prancingwalrustests" {
+		if match {
 			// get the username
 			name := ctx.Interaction.Member.User.Username
-			// fmt.Printf("In MessageHandler: ctx: %v\n", ctx)
-			// fmt.Printf("In MessageHandler: ctx.interaction: %v\n", ctx.Interaction)
-			// fmt.Printf("In MessageHandler: ctx.interaction.Member: %v\n", ctx.Interaction.Member)
-			// fmt.Printf("In MessageHandler: ctx.interaction.Member.User: %v\n", ctx.Interaction.Member.User)
-			// fmt.Printf("In MessageHandler: ctx.interaction.Member.Nick: %v\n", ctx.Interaction.Member.Nick)
 			_ = ctx.Respond(&discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
@@ -39,7 +43,7 @@ var MyAssignment = &disgolf.Command{
 			_ = ctx.Respond(&discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: "This has been a test. Thank you, and please send fish.",
+					Content: fmt.Sprintf("This command is only available from the %s channel.", "species-war"), // TODO: replace this when config is available everywhere (Config.WarPlanningChannelName)
 				},
 			})
 		}
