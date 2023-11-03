@@ -13,7 +13,7 @@ import (
 	"go.uber.org/zap"
 )
 
-const parameterFile = "../config.json"
+const defaultParameterFile = "../config.json"
 
 var (
 	Log        *zap.SugaredLogger
@@ -54,8 +54,15 @@ func getLogger() (err error) {
 
 func ReadConfig() (err error) {
 	err = nil
-	Log.Infow("reading config", "file", parameterFile)
-	file, err := os.ReadFile(parameterFile)
+	confFile := ""
+	if os.Getenv("CONFIG") == "" {
+		confFile = defaultParameterFile
+	} else {
+		confFile = os.Getenv("CONFIG")
+	}
+
+	Log.Infow("reading config", "file", confFile)
+	file, err := os.ReadFile(confFile)
 	if err != nil {
 		return
 	}
