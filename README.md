@@ -29,7 +29,7 @@ cd /home/delve202/prancing-walrus/walrusbot
 ```
 * reboot or manually exec startup script
 
-rest call to gen VM
+rest call to gen VM. note the token replace
 ```
 {
   "canIpForward": false,
@@ -91,7 +91,7 @@ rest call to gen VM
         "key": "ssh-keys"
       },
       {
-        "value": "BOT_TOKEN=MTE2OTMzMjA4NDgxMzM0ODg2NQ.GS9fQU.gCfolVuWGpi0WdbTlBeIAhhk4oCcElspgczMYY\ncd /home/delve202/prancing-walrus/walrusbot\n/usr/local/go/bin/go run .",
+        "value": "BOT_TOKEN=<insert token>\ncd /home/delve202/prancing-walrus/walrusbot\n/usr/local/go/bin/go run .",
         "key": "startup-script"
       }
     ]
