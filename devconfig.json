@@ -1,7 +1,7 @@
 {
     "Token": "BOT_TOKEN", 
     "BotPrefix": ["d.", "dis.", "disgolf."],
-    "AppId": "1169332084813348865",
+    "AppId": "1170099827611291761",
     "ServerId": "775636532161019955",
     "WarPlanningChannel": {
         "regex": "species-war$",
