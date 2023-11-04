@@ -66,8 +66,8 @@ func getAssignmentMessage(name string) (assignMsg string) {
 	assign, found := assignments[name]
 	if found {
 		var sb strings.Builder
-		// sb.WriteString(fmt.Sprintf("Hi %s! You're assigned to the %s kit. Please gather fossil %s.\n", assign.gameName, assign.role, assign.gather))
-		sb.WriteString(fmt.Sprintf("Hi %s! You're assigned to the %s kit.\n", assign.gameName, assign.role))
+		sb.WriteString(fmt.Sprintf("Hi %s! You're assigned to the %s kit. Please gather fossil %s.\n", assign.gameName, assign.role, assign.gather))
+		// sb.WriteString(fmt.Sprintf("Hi %s! You're assigned to the %s kit.\n", assign.gameName, assign.role))
 		if assign.canUseClamMagic {
 			sb.WriteString("If it's a clam war this week please use spells as you see fit.")
 		} else {
