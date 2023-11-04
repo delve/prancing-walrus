@@ -29,6 +29,7 @@ export GOCACHE='/home/delve202/.cache/go-build'
 export GOMODCACHE='/home/delve202/go/pkg/mod'
 export GOPATH='/home/delve202/go'
 cd /home/delve202/prancing-walrus/walrusbot
+git config --global --add safe.directory /home/delve202/prancing-walrus
 echo "Git Pull" > /tmp/log.txt
 echo "---------" >> /tmp/log.txt
 git pull &>> /tmp/log.txt
@@ -89,24 +90,25 @@ rest call to gen VM. note the token replace
   "displayDevice": {
     "enableDisplay": false
   },
-  "fingerprint": "Ha8y9KIlJGo=",
+  "fingerprint": "yzZ_LFQrweM=",
   "id": "2100367559267969676",
   "keyRevocationActionType": "NONE",
   "kind": "compute#instance",
   "labelFingerprint": "42WmSpB8rSM=",
-  "lastStartTimestamp": "2023-11-04T07:25:48.865-07:00",
+  "lastStartTimestamp": "2023-11-04T09:25:47.148-07:00",
+  "lastStopTimestamp": "2023-11-04T09:24:34.804-07:00",
   "machineType": "projects/prancingwalrus/zones/us-central1-a/machineTypes/e2-micro",
   "metadata": {
-    "fingerprint": "swIPQWFZSUE=",
+    "fingerprint": "vJ_4fb_h8cY=",
     "kind": "compute#metadata",
     "items": [
       {
-        "value": "delve202:ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBO56TzPbk7tJHLyDuN3aKzD0feIPiEs+3bV/5KKVxI+R2WL7EFVlUKuAJ/vRZdfJQ9sdalNsIZLuS3jP9SgbyBY= google-ssh {\"userName\":\"delve202@gmail.com\",\"expireOn\":\"2023-11-04T14:29:30+0000\"}\ndelve202:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAEaxtzuwxwNrW3NPMk6tUnLz5xKx5bO8yDaOPu15ts/XTSAr60uXy6VUmBx6qF8V9c+qUwVgz7fFK3904ZOdcxxb+OZfAeKhnQ9uFqFlXHO2Ke7mcl7KB+S1S6uhLnEIp6jikA8h+1/j4i8U2MKqBZUuYXwbfi2PXE1I95Qkc960eXnGlV0YuStYVfa/p5FZmoGq6tm4iJK0ksoXz1WLeP/TtlpdBuLDiDzOJWu84a8CEYPxla6HPPxLXCXPNwDjBvmZ8So31uzdfIXWmSwTk8vWaWISz/mPvBm6Vtu47gQ79Pnx9HAIAetpYHMfa3/LgtL3Hh+ez4v6XiNDjg9Mwp8= google-ssh {\"userName\":\"delve202@gmail.com\",\"expireOn\":\"2023-11-04T14:29:48+0000\"}",
-        "key": "ssh-keys"
+        "value": "export BOT_TOKEN=<BOT_TOKEN>\nexport GOCACHE='/home/delve202/.cache/go-build'\nexport GOMODCACHE='/home/delve202/go/pkg/mod'\nexport GOPATH='/home/delve202/go'\ncd /home/delve202/prancing-walrus/walrusbot\ngit config --global --add safe.directory /home/delve202/prancing-walrus\necho \"Git Pull\" > /tmp/log.txt\necho \"---------\" >> /tmp/log.txt\ngit pull &>> /tmp/log.txt\necho \"---------\" >> /tmp/log.txt\necho \"Go Env\" >> /tmp/log.txt\necho \"---------\" >> /tmp/log.txt\n/usr/local/go/bin/go env &>> /tmp/log.txt\necho \"---------\" >> /tmp/log.txt\necho \"Go Run\" >> /tmp/log.txt\necho \"---------\" >> /tmp/log.txt\n/usr/local/go/bin/go run . &>> /tmp/log.txt",
+        "key": "startup-script"
       },
       {
-        "value": "export BOT_TOKEN=<insert token>\ncd /home/delve202/prancing-walrus/walrusbot\n/usr/local/go/bin/go run .",
-        "key": "startup-script"
+        "value": "delve202:ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBJ0/BUNaYxqwnRfsK+MQ6YkQL2mslXfP8I82DMVS21EHimv+jtI0F2D43Tfrj5r9CJTUq1a93G4SbsTll7Ea01w= google-ssh {\"userName\":\"delve202@gmail.com\",\"expireOn\":\"2023-11-04T16:38:28+0000\"}\ndelve202:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDXk1AMD1MLD5bpbW55rd5OUbLeSuNsg/PmYABQ6vruFEb83uXegAH+R+8wh2Mjk/Gi3yykbc7jn8wv2tUdYYefhQH+peR44v4q/jHgbBlKm0N2FGwGXgb5l2CTyzfNgl8spBf0C3Bo08Gzx1dyNcMqekLdsfr8/4vX0R8T02crgcyOSVHnaa+3VEdZFhlX42RD9bOe84okDVpwgS7MAggw7fE53dJqAl7jJiSS3DbE209/ZBM0gPw8a3928k1fEd/NgzUTmGS9m75sXKj3fxbxS3WNIMYl8eyJ5EOlmHbBtmCr0UUmcVRhZDB8Nx4Mm1aIpDBbvgk0WDQ2TeyMlz4P google-ssh {\"userName\":\"delve202@gmail.com\",\"expireOn\":\"2023-11-04T16:38:46+0000\"}",
+        "key": "ssh-keys"
       }
     ]
   },
@@ -134,7 +136,9 @@ rest call to gen VM. note the token replace
   "reservationAffinity": {
     "consumeReservationType": "ANY_RESERVATION"
   },
-  "resourceStatus": {},
+  "resourceStatus": {
+    "scheduling": {}
+  },
   "scheduling": {
     "onHostMaintenance": "MIGRATE",
     "provisioningModel": "STANDARD",
