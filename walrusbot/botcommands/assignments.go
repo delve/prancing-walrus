@@ -11,19 +11,19 @@ type assignment struct {
 
 func init() {
 	assignments = map[string]assignment{}
-	assignments["discoDustinJ"] = assignment{
+	assignments["dustinj"] = assignment{
 		gameName:        "DustinJ",
 		role:            "Vanguard",
 		gather:          "a",
 		canUseClamMagic: false,
 	}
-	assignments["discoChaos"] = assignment{
+	assignments["iknyc"] = assignment{
 		gameName:        "Chaos",
 		role:            "Vanguard",
 		gather:          "a",
 		canUseClamMagic: true,
 	}
-	assignments["discoBionicTurkey"] = assignment{
+	assignments["bionic_turkey"] = assignment{
 		gameName:        "BionicTurkey",
 		role:            "Vanguard",
 		gather:          "a",
@@ -35,43 +35,43 @@ func init() {
 		gather:          "a",
 		canUseClamMagic: false,
 	}
-	assignments["discoTraveler000"] = assignment{
+	assignments["na000"] = assignment{
 		gameName:        "Traveler000",
 		role:            "Prospector",
 		gather:          "a",
 		canUseClamMagic: false,
 	}
-	assignments["discoSatyrislug"] = assignment{
+	assignments["satyrical1"] = assignment{
 		gameName:        "Satyrislug",
 		role:            "Prospector",
 		gather:          "a",
 		canUseClamMagic: false,
 	}
-	assignments["discogooberr"] = assignment{
+	assignments["twentygauge37"] = assignment{
 		gameName:        "gooberr",
 		role:            "Vanguard",
 		gather:          "a",
 		canUseClamMagic: false,
 	}
-	assignments["discoRooRoo"] = assignment{
+	assignments["roo1987"] = assignment{
 		gameName:        "RooRoo",
 		role:            "Vanguard",
 		gather:          "a",
 		canUseClamMagic: false,
 	}
-	assignments["discoShiviro"] = assignment{
+	assignments["shiviro"] = assignment{
 		gameName:        "Shiviro",
 		role:            "Vanguard",
 		gather:          "a",
 		canUseClamMagic: false,
 	}
-	assignments["discoSeven"] = assignment{
+	assignments["sevensinlegion"] = assignment{
 		gameName:        "Seven",
 		role:            "Vanguard",
 		gather:          "a",
 		canUseClamMagic: false,
 	}
-	assignments["discoGoodie"] = assignment{
+	assignments["goodie5624"] = assignment{
 		gameName:        "Goodie",
 		role:            "Prospector",
 		gather:          "a",
@@ -83,37 +83,37 @@ func init() {
 		gather:          "a",
 		canUseClamMagic: false,
 	}
-	assignments["discoDarkIncubus"] = assignment{
+	assignments["darkincubus"] = assignment{
 		gameName:        "DarkIncubus",
 		role:            "Vanguard",
 		gather:          "a",
 		canUseClamMagic: false,
 	}
-	assignments["discoPwese23"] = assignment{
+	assignments["thepokemonmattster"] = assignment{
 		gameName:        "Pwese23",
 		role:            "Vanguard",
 		gather:          "a",
 		canUseClamMagic: false,
 	}
-	assignments["discoTraveleryee"] = assignment{
+	assignments["calbehe"] = assignment{
 		gameName:        "Traveleryee",
 		role:            "Vanguard",
 		gather:          "a",
 		canUseClamMagic: false,
 	}
-	assignments["discoRexromos"] = assignment{
+	assignments["rexromos"] = assignment{
 		gameName:        "Rexromos",
 		role:            "Prospector",
 		gather:          "b",
 		canUseClamMagic: false,
 	}
-	assignments["discoTheTraveler"] = assignment{
+	assignments["the.inTIMidator24015"] = assignment{
 		gameName:        "TheTraveler",
 		role:            "Prospector",
 		gather:          "b",
 		canUseClamMagic: false,
 	}
-	assignments["discoDannySpeed"] = assignment{
+	assignments["dannyspeed_"] = assignment{
 		gameName:        "DannySpeed",
 		role:            "Prospector",
 		gather:          "b",
@@ -125,7 +125,7 @@ func init() {
 		gather:          "b",
 		canUseClamMagic: false,
 	}
-	assignments["discoWaffleDuck"] = assignment{
+	assignments["waffleduck4990"] = assignment{
 		gameName:        "WaffleDuck",
 		role:            "Vanguard",
 		gather:          "b",
@@ -137,37 +137,37 @@ func init() {
 		gather:          "b",
 		canUseClamMagic: false,
 	}
-	assignments["discoGoldSpaceman"] = assignment{
+	assignments["king_za215"] = assignment{
 		gameName:        "GoldSpaceman",
 		role:            "Prospector",
 		gather:          "b",
 		canUseClamMagic: false,
 	}
-	assignments["discoStSteve"] = assignment{
+	assignments["agentmeep"] = assignment{
 		gameName:        "StSteve",
 		role:            "Prospector",
 		gather:          "b",
 		canUseClamMagic: false,
 	}
-	assignments["discoanzo6910"] = assignment{
+	assignments["sea19anzomathew"] = assignment{
 		gameName:        "anzo6910",
 		role:            "Vanguard",
 		gather:          "b",
 		canUseClamMagic: false,
 	}
-	assignments["discoSlipstream"] = assignment{
+	assignments["slipstreamx10x"] = assignment{
 		gameName:        "Slipstream",
 		role:            "Vanguard",
 		gather:          "b",
 		canUseClamMagic: false,
 	}
-	assignments["disco0069"] = assignment{
+	assignments["whitessmaro"] = assignment{
 		gameName:        "0069",
 		role:            "Vanguard",
 		gather:          "b",
 		canUseClamMagic: false,
 	}
-	assignments["discoTaytertot"] = assignment{
+	assignments["Taytertot"] = assignment{
 		gameName:        "Taytertot",
 		role:            "Vanguard",
 		gather:          "b",
@@ -179,61 +179,61 @@ func init() {
 		gather:          "b",
 		canUseClamMagic: false,
 	}
-	assignments["discoAlex"] = assignment{
+	assignments["calyxalex"] = assignment{
 		gameName:        "Alex",
 		role:            "Vanguard",
 		gather:          "b",
 		canUseClamMagic: false,
 	}
-	assignments["discoRorstark"] = assignment{
+	assignments["rorstark12"] = assignment{
 		gameName:        "Rorstark",
 		role:            "Vanguard",
 		gather:          "b",
 		canUseClamMagic: false,
 	}
-	assignments["discobenc247"] = assignment{
+	assignments["benjaminc247"] = assignment{
 		gameName:        "benc247",
 		role:            "Vanguard",
 		gather:          "γ",
 		canUseClamMagic: false,
 	}
-	assignments["discostoopoodoopoo"] = assignment{
+	assignments["ikeepitnacho"] = assignment{
 		gameName:        "stoopoodoopoo",
 		role:            "Prospector",
 		gather:          "γ",
 		canUseClamMagic: false,
 	}
-	assignments["discoLishaBourne"] = assignment{
+	assignments["lishabourne"] = assignment{
 		gameName:        "LishaBourne",
 		role:            "Prospector",
 		gather:          "γ",
 		canUseClamMagic: false,
 	}
-	assignments["discoVenom"] = assignment{
+	assignments["Venomn0us"] = assignment{
 		gameName:        "Venom",
 		role:            "Vanguard",
 		gather:          "γ",
 		canUseClamMagic: false,
 	}
-	assignments["discosluginthemidst"] = assignment{
+	assignments["Rye the Quiet"] = assignment{
 		gameName:        "sluginthemidst",
 		role:            "Prospector",
 		gather:          "γ",
 		canUseClamMagic: false,
 	}
-	assignments["discojustcallmeyd"] = assignment{
+	assignments["justcallmeyd"] = assignment{
 		gameName:        "justcallmeyd",
 		role:            "Prospector",
 		gather:          "γ",
 		canUseClamMagic: false,
 	}
-	assignments["disconiagrafalls"] = assignment{
+	assignments["knivesnchains"] = assignment{
 		gameName:        "niagrafalls",
 		role:            "Prospector",
 		gather:          "γ",
 		canUseClamMagic: false,
 	}
-	assignments["discoAszuzsa"] = assignment{
+	assignments["seraphic9"] = assignment{
 		gameName:        "Aszuzsa",
 		role:            "Prospector",
 		gather:          "γ",
@@ -245,7 +245,7 @@ func init() {
 		gather:          "γ",
 		canUseClamMagic: false,
 	}
-	assignments["discoMegümin"] = assignment{
+	assignments["arkane_x6"] = assignment{
 		gameName:        "Megümin",
 		role:            "Prospector",
 		gather:          "γ",
@@ -257,7 +257,7 @@ func init() {
 		gather:          "γ",
 		canUseClamMagic: false,
 	}
-	assignments["discoJHZ1"] = assignment{
+	assignments["JHZ1"] = assignment{
 		gameName:        "JHZ1",
 		role:            "Prospector",
 		gather:          "γ",
@@ -275,13 +275,13 @@ func init() {
 		gather:          "γ",
 		canUseClamMagic: false,
 	}
-	assignments["discokurama215"] = assignment{
+	assignments["kurama215"] = assignment{
 		gameName:        "kurama215",
 		role:            "Vanguard",
 		gather:          "γ",
 		canUseClamMagic: false,
 	}
-	assignments["discolucifer"] = assignment{
+	assignments["vinnydev"] = assignment{
 		gameName:        "lucifer",
 		role:            "Prospector",
 		gather:          "γ",

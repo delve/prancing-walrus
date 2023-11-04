@@ -23,9 +23,22 @@ GCP GCE. cloud run was too expensive.
 * * git checkout <prodbranch>
 * set startup script TODO: secrets management yo?
 ```
-BOT_TOKEN=<token>
+export BOT_TOKEN=<token>
+export GOCACHE='/home/delve202/.cache/go-build'
+export GOMODCACHE='/home/delve202/go/pkg/mod'
+export GOPATH='/home/delve202/go'
 cd /home/delve202/prancing-walrus/walrusbot
-/usr/local/go/bin/go run .
+echo "Git Pull" > /tmp/log.txt
+echo "---------" >> /tmp/log.txt
+git pull &>> /tmp/log.txt
+echo "---------" >> /tmp/log.txt
+echo "Go Env" >> /tmp/log.txt
+echo "---------" >> /tmp/log.txt
+/usr/local/go/bin/go env &>> /tmp/log.txt
+echo "---------" >> /tmp/log.txt
+echo "Go Run" >> /tmp/log.txt
+echo "---------" >> /tmp/log.txt
+/usr/local/go/bin/go run . &>> /tmp/log.txt
 ```
 * reboot or manually exec startup script
 
@@ -91,7 +104,7 @@ rest call to gen VM. note the token replace
         "key": "ssh-keys"
       },
       {
-        "value": "BOT_TOKEN=<insert token>\ncd /home/delve202/prancing-walrus/walrusbot\n/usr/local/go/bin/go run .",
+        "value": "export BOT_TOKEN=<insert token>\ncd /home/delve202/prancing-walrus/walrusbot\n/usr/local/go/bin/go run .",
         "key": "startup-script"
       }
     ]
