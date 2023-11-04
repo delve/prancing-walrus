@@ -76,6 +76,7 @@ func ReadConfig() (err error) {
 		Log.Infow("token not found in config.json; reading from environment")
 		Config.Token = os.Getenv("BOT_TOKEN")
 	}
+	Log.Infow("found token", "length", len(Config.Token))
 
 	return
 }
