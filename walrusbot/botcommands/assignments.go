@@ -193,7 +193,7 @@ func init() {
 	}
 	assignments["discobenc247"] = assignment{
 		gameName:        "benc247",
-		role:            "Prospector",
+		role:            "Vanguard",
 		gather:          "γ",
 		canUseClamMagic: false,
 	}
@@ -271,7 +271,7 @@ func init() {
 	}
 	assignments["discoTimmy"] = assignment{
 		gameName:        "Timmy",
-		role:            "Vanguard",
+		role:            "Prospector",
 		gather:          "γ",
 		canUseClamMagic: false,
 	}
