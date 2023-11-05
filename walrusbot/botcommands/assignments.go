@@ -179,7 +179,7 @@ func init() {
 		gather:          "b",
 		canUseClamMagic: false,
 	}
-	assignments["calyxalex"] = assignment{
+	assignments["calyx alex"] = assignment{
 		gameName:        "Alex",
 		role:            "Vanguard",
 		gather:          "b",

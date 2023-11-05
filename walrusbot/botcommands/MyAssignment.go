@@ -29,10 +29,10 @@ var MyAssignment = &disgolf.Command{
 			panic(err)
 		}
 
-		fmt.Printf("In Handler channel: %v\n", thisChan.Name)
+		name := ctx.Interaction.Member.User.Username
+		fmt.Printf("In Handler channel: \"%v\" user: \"%v\"\n", thisChan.Name, name)
 		if match {
 			// get the username
-			name := ctx.Interaction.Member.User.Username
 			_ = ctx.Respond(&discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
