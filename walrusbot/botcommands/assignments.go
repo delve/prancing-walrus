@@ -11,8 +11,8 @@ type assignment struct {
 
 func init() {
 	assignments = map[string]assignment{}
-	assignments["dustinj"] = assignment{
-		gameName:        "DustinJ",
+	assignments["gaze3"] = assignment{
+		gameName:        "Gaze",
 		role:            "Vanguard",
 		gather:          "a",
 		canUseClamMagic: false,
@@ -185,8 +185,8 @@ func init() {
 		gather:          "b",
 		canUseClamMagic: false,
 	}
-	assignments["rorstark12"] = assignment{
-		gameName:        "Rorstark",
+	assignments["th31nd00rs"] = assignment{
+		gameName:        "TH31NDOORS",
 		role:            "Vanguard",
 		gather:          "b",
 		canUseClamMagic: false,
@@ -211,7 +211,7 @@ func init() {
 	}
 	assignments["Venomn0us"] = assignment{
 		gameName:        "Venom",
-		role:            "Vanguard",
+		role:            "Prospector",
 		gather:          "γ",
 		canUseClamMagic: false,
 	}
@@ -283,7 +283,7 @@ func init() {
 	}
 	assignments["vinnydev"] = assignment{
 		gameName:        "lucifer",
-		role:            "Prospector",
+		role:            "Vanguard",
 		gather:          "γ",
 		canUseClamMagic: false,
 	}
