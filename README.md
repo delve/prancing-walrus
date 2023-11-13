@@ -31,6 +31,7 @@ GCP GCE. cloud run was too expensive.
 * set startup script TODO: secrets management yo?
 ```
 export BOT_TOKEN=<token>
+export APIKey=<key>
 export GOCACHE='/home/delve202/.cache/go-build'
 export GOMODCACHE='/home/delve202/go/pkg/mod'
 export GOPATH='/home/delve202/go'

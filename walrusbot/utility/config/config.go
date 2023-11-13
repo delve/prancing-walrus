@@ -54,7 +54,7 @@ func readConfig() (err error) {
 
 	if Values.APIKey == "" {
 		log.Infow("API key not found in config.json; reading from environment")
-		Values.Token = os.Getenv("APIKey")
+		Values.APIKey = os.Getenv("APIKey")
 	}
 	log.Infow("found key", "length", len(Values.APIKey))
 
