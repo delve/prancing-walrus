@@ -1,105 +1,35 @@
 package main
 
 import (
-	"encoding/json"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
-	"walrusbot/botcommands"
+	"walrusbot/bot/assignment"
+	botcommands "walrusbot/bot/commands"
+	"walrusbot/utility/check"
+	"walrusbot/utility/config"
+	"walrusbot/utility/log"
 
 	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
-	"go.uber.org/zap"
 )
 
-const defaultParameterFile = "../config.json"
-
 var (
-	Log        *zap.SugaredLogger
-	FastLogger *zap.Logger
-
-	Config *configStruct
-
 	BotId string
 )
 
-type configStruct struct {
-	Token                   string   `json:"Token"`
-	BotPrefix               []string `json:"BotPrefix"`
-	AppId                   string   `json:"AppId"`
-	WarPlanningChannelRegex string   `json:"WarPlanningChannel.regex"`
-	WarPlanningChannelName  string   `json:"WarPlanningChannel.name"`
-	// Only set this if you want to limit the servers the bot talks to
-	ServerId string `json:"ServerId"`
-}
-
-func Check(err error) {
-	if err != nil {
-		Log.Fatalw("unhandled error", "err", err)
-	}
-}
-
-func getLogger() (err error) {
-	err = nil
-	// TODO: NewProduction is a canned set of production-ready configs for the logger.
-	//       expand to customizable configs and enable changing log level. from env var? updating via chat cmds?
-	FastLogger, err = zap.NewProduction()
-	if err != nil {
-		return
-	}
-	Log = FastLogger.Sugar()
-	return
-}
-
-func ReadConfig() (err error) {
-	err = nil
-	confFile := ""
-	if os.Getenv("CONFIG") == "" {
-		confFile = defaultParameterFile
-	} else {
-		confFile = os.Getenv("CONFIG")
-	}
-
-	Log.Infow("reading config", "file", confFile)
-	file, err := os.ReadFile(confFile)
-	if err != nil {
-		return
-	}
-
-	err = json.Unmarshal(file, &Config)
-	if err != nil {
-		return
-	}
-
-	if Config.Token == "BOT_TOKEN" {
-		Log.Infow("token not found in config.json; reading from environment")
-		Config.Token = os.Getenv("BOT_TOKEN")
-	}
-	Log.Infow("found token", "length", len(Config.Token))
-
-	return
-}
-
-func init() {
-	err := getLogger()
-	if err != nil {
-		panic(err)
-	}
-	Log.Infow("starting up...")
-
-	err = ReadConfig()
-	Check(err)
-}
-
 func main() {
-	defer FastLogger.Sync() // flushes buffer, if any
+	log.Infow("Inited, main starting up...")
+	defer log.FastLogger.Sync() // flushes buffer, if any
 
-	bot, err := disgolf.New(Config.Token)
-	// bot, err := disgolf.New("fQ9joR5zEH1xKEupw7ylSzivQCtnIoJh")
-	if err != nil {
-		Log.Fatalw("failed to init disgolf", "err", err)
-	}
+	// check the bot is minimally functional before loading any data
+	bot, err := disgolf.New(config.Values.Token)
+	check.Err(err, "failed to init disgolf")
+
+	// initial cache of assignment data
+	assignment.CacheAssignments()
+
 	bot.Router.Register(&disgolf.Command{
 		Name:        "ping",
 		Description: "Ping it!",
@@ -121,7 +51,7 @@ func main() {
 		// Middlewares array executes (before? after?) a / command handler. because???
 		Middlewares: []disgolf.Handler{
 			disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-				Log.Infow("Middleware worked!")
+				log.Infow("Middleware worked!")
 				ctx.Next()
 			}),
 		},
@@ -129,7 +59,7 @@ func main() {
 		// MessageMiddlewares array executes (before? after?) a @ mention or prefixed message handler. because???
 		MessageMiddlewares: []disgolf.MessageHandler{
 			disgolf.MessageHandlerFunc(func(ctx *disgolf.MessageCtx) {
-				Log.Infow("Message niddleware worked!", "command args", ctx.Arguments)
+				log.Infow("Message niddleware worked!", "command args", ctx.Arguments)
 				ctx.Next()
 			}),
 		},
@@ -138,7 +68,7 @@ func main() {
 	bot.Router.Register(botcommands.MyAssignment)
 
 	bot.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
-		Log.Infow("Bot is up!")
+		log.Infow("Bot is up!")
 	})
 	bot.AddHandler(bot.Router.HandleInteraction)
 	bot.AddHandler(bot.Router.MakeMessageHandler(&disgolf.MessageHandlerConfig{
@@ -148,12 +78,12 @@ func main() {
 
 	err = bot.Open()
 	if err != nil {
-		Log.Fatalw("bot open exited with a error", "err", err)
+		log.Fatalw("bot open exited with a error", "err", err)
 	}
 	defer bot.Close()
-	err = bot.Router.Sync(bot.Session, Config.AppId, Config.ServerId)
+	err = bot.Router.Sync(bot.Session, config.Values.AppId, config.Values.ServerId)
 	if err != nil {
-		Log.Fatalw("cannot publish commands", "err", err)
+		log.Fatalw("cannot publish commands", "err", err)
 	}
 	stchan := make(chan os.Signal, 1)
 	signal.Notify(stchan, syscall.SIGTERM, os.Interrupt, syscall.SIGSEGV)

@@ -1,5 +1,12 @@
 # prancing-walrus
-data sheet https://docs.google.com/spreadsheets/d/e/2PACX-1vTsyzQcY8IlN6k6j-Z1aYy1wosWyJ_RzMfBboQ7pJy2ik06siN4qwzRF2VlACrtw4XiLzWK5py7ctSN/pubhtml
+
+# TODO
+* log to gcloud. and maybe also a file, but roll it in the code.
+* adjust spreadsheet integration to role and gathering columns
+* make log messages show correct caller, not `"caller":"log/log.go:20"`
+* enable recaching
+* enable user updates. include failsafe for values out of bounds
+* make all config values read from env and default to configfile if not found
 
 # Perms nded
 Scope: Bot
@@ -9,7 +16,6 @@ Scope: Bot
 * Use external stickers
 * Add reactions
 * Use slash comands
-
 
 # Hosting
 GCP GCE. cloud run was too expensive.
@@ -189,6 +195,6 @@ rest call to gen VM. note the token replace
 
 # Dev-ing
 ## prereq
-set CONFIG and BOT_TOKEN env vars for this repo in gitpod user settings. CONFIG should be '../devconfig.json', BOT_TOKEN should be the bot token from Discord. Get yer own. The devconfig has a test app id and specific server id so as to not interfere with the 'production' bot.
+set CONFIG, APIKey, and BOT_TOKEN env vars for this repo in gitpod user settings. CONFIG should be '../devconfig.json', BOT_TOKEN should be the bot token from Discord. Get yer own. The devconfig has a test app id and specific server id so as to not interfere with the 'production' bot.
 
 does app id need to be per dev also? worry about it when it's not just me. at some point consider loading both configs with merge/overwrite logic to reduce duplication

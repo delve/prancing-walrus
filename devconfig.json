@@ -1,10 +1,14 @@
 {
-    "Token": "BOT_TOKEN", 
-    "BotPrefix": ["d.", "dis.", "disgolf."],
+    "Token": "", 
+    "APIKey": "",
+    "BotPrefix": ["w.", "walrus."],
     "AppId": "1170099827611291761",
     "ServerId": "775636532161019955",
-    "WarPlanningChannel": {
-        "regex": "species-war$",
-        "name": "species-war"
-    }
+    "WarPlanningChannels": [
+        "🧬・prancingwalrustests",
+        "🧬・species-war",
+        "👥・species-war",
+        "🏯・species-war"
+    ],
+    "SheetId": "1s3s7Ig-3WOAwKeRu74tcaYj6NOyaX5fnIcgT0_jvB3k"
 }

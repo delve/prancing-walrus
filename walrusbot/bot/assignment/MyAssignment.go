@@ -1,9 +1,10 @@
-package botcommands
+package assignment
 
 import (
 	"fmt"
-	"regexp"
 	"strings"
+	"walrusbot/utility/config"
+	"golang.org/x/exp/slices"
 
 	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
@@ -21,17 +22,10 @@ var MyAssignment = &disgolf.Command{
 		if err != nil {
 			panic(err)
 		}
-		// TODO: replace this when config is available everywhere
-		match, err := regexp.MatchString("species-war$", thisChan.Name)
-		// match, _ := regexp.MatchString(Config.WarPlanningChannelRegex, thisChan)
-		// TODO: replace this when Check is available everywhere
-		if err != nil {
-			panic(err)
-		}
 
 		name := ctx.Interaction.Member.User.Username
 		fmt.Printf("In Handler channel: \"%v\" user: \"%v\"\n", thisChan.Name, name)
-		if match {
+		if slices.Contains(config.Values.WarPlanningChannels, thisChan.Name) {
 			// get the username
 			_ = ctx.Respond(&discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
@@ -43,7 +37,7 @@ var MyAssignment = &disgolf.Command{
 			_ = ctx.Respond(&discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: fmt.Sprintf("This command is only available from the %s channel.", "species-war"), // TODO: replace this when config is available everywhere (Config.WarPlanningChannelName)
+					Content: fmt.Sprintf("This command is only available from these channels %v", config.Values.WarPlanningChannels), // TODO: replace this when config is available everywhere (Config.WarPlanningChannelName)
 				},
 			})
 		}
