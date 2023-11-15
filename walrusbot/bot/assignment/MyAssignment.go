@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"walrusbot/utility/config"
+
 	"golang.org/x/exp/slices"
 
 	"github.com/FedorLap2006/disgolf"
@@ -60,8 +61,21 @@ func getAssignmentMessage(name string) (assignMsg string) {
 	assign, found := assignments[name]
 	if found {
 		var sb strings.Builder
-		sb.WriteString(fmt.Sprintf("Hi %s! You're assigned to the %s kit. Please gather fossil %s.\n", assign.gameName, assign.role, assign.gather))
-		// sb.WriteString(fmt.Sprintf("Hi %s! You're assigned to the %s kit.\n", assign.gameName, assign.role))
+		sb.WriteString(fmt.Sprintf("Hi %s! ", assign.gameName))
+		if assign.role == "" {
+			// TODO: grab the manager roleid dynamically. allow config for role(s?) to mention
+			sb.WriteString("Looks like you don't have a kit assignment yet. Paging <@&1154960752004845646> for assistance. ")
+		} else {
+			sb.WriteString(fmt.Sprintf("You're assigned to the %s kit. ", assign.role))
+		}
+
+		if assign.gather == "" {
+			// TODO: grab the manager roleid dynamically. allow config for role(s?) to mention
+			sb.WriteString("Looks like you haven't been assigned a fossil to gather yet. Please gather whatever fossil type we seem have the fewest of.\n")
+		} else {
+			sb.WriteString(fmt.Sprintf("Please gather fossil %s.\n", assign.gather))
+		}
+
 		if assign.canUseClamMagic {
 			sb.WriteString("If it's a clam war this week please use spells as you see fit.")
 		} else {

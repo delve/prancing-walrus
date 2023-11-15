@@ -75,19 +75,29 @@ func CacheAssignments() {
 				player[headers[element].(string)] = val.(string)
 			}
 
-			/* abstracting player name away from the data because some of them are empty in the sheet.
-			this causes the array to be truncated so calling playerRecord[1] results in an
-			index out of range error. if it's missing just make it blank for now.
+			/* abstracting some values away from the data because some of them are empty in the sheet.
+			   this causes the array to be truncated so calling playerRecord[1] results in an
+			   index out of range error. if it's missing just make it blank for now.
 			*/
 			name := ""
 			if len(playerRecord) >= 2 {
 				name = playerRecord[1].(string)
 			}
 
+			role := ""
+			if len(playerRecord) >= 4 {
+				role = playerRecord[3].(string)
+			}
+
+			gather := ""
+			if len(playerRecord) >= 5 {
+				gather = playerRecord[4].(string)
+			}
+
 			assignments[playerRecord[0].(string)] = assignment{
 				gameName:        name,
-				role:            "",
-				gather:          "",
+				role:            role,
+				gather:          gather,
 				canUseClamMagic: false,
 				data:            player,
 			}

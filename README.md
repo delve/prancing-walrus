@@ -2,7 +2,7 @@
 
 # TODO
 * log to gcloud. and maybe also a file, but roll it in the code.
-* adjust spreadsheet integration to role and gathering columns
+* grab the roleid for `manager` dynamically
 * make log messages show correct caller, not `"caller":"log/log.go:20"`
 * enable recaching
 * enable user updates. include failsafe for values out of bounds
