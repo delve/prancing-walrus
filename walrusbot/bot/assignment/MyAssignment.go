@@ -57,7 +57,7 @@ var MyAssignment = &disgolf.Command{
 }
 
 func getAssignmentMessage(name string) (assignMsg string) {
-	assignMsg = "Sorry, looks like I have no assignment for you. Go bug the managers and leave me to my fish."
+	assignMsg = "Sorry bud, I don't know who you are. Paging <@&1154960752004845646> for assistance."
 	assign, found := assignments[name]
 	if found {
 		var sb strings.Builder

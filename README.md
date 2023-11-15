@@ -2,6 +2,8 @@
 
 # TODO
 * log to gcloud. and maybe also a file, but roll it in the code.
+* timestamp the cache, auto update it (daily?)
+* update the cache once (if older than (3?)hours) when someone is missing an assignment
 * grab the roleid for `manager` dynamically
 * make log messages show correct caller, not `"caller":"log/log.go:20"`
 * enable recaching
