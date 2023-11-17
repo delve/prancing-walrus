@@ -38,11 +38,11 @@ func main() {
 	})
 	bot.AddHandler(bot.Router.HandleInteraction)
 	bot.AddHandler(bot.Router.MakeMessageHandler(&disgolf.MessageHandlerConfig{
+		// TODO: tidy this
 		Prefixes:      []string{"d.", "dis.", "disgolf."},
 		MentionPrefix: true,
 	}))
 
-	log.Infow("opening bot", "routerlist", bot.Router.List())
 	err = bot.Open()
 	if err != nil {
 		log.Fatalw("bot open exited with a error", "err", err)
