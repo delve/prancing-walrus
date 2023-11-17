@@ -42,6 +42,7 @@ func main() {
 		MentionPrefix: true,
 	}))
 
+	log.Infow("opening bot", "routerlist", bot.Router.List())
 	err = bot.Open()
 	if err != nil {
 		log.Fatalw("bot open exited with a error", "err", err)
