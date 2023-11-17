@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"walrusbot/utility/config"
+	"walrusbot/utility/log"
 
 	"golang.org/x/exp/slices"
 
@@ -25,7 +26,7 @@ var MyAssignment = &disgolf.Command{
 		}
 
 		name := ctx.Interaction.Member.User.Username
-		fmt.Printf("In Handler channel: \"%v\" user: \"%v\"\n", thisChan.Name, name)
+		log.Infow("In Handler", "command", "myassignment", "channel", thisChan.Name, "user", name)
 		if slices.Contains(config.Values.WarPlanningChannels, thisChan.Name) {
 			// get the username
 			_ = ctx.Respond(&discordgo.InteractionResponse{
@@ -38,7 +39,59 @@ var MyAssignment = &disgolf.Command{
 			_ = ctx.Respond(&discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: fmt.Sprintf("This command is only available from these channels %v", config.Values.WarPlanningChannels), // TODO: replace this when config is available everywhere (Config.WarPlanningChannelName)
+					Content: fmt.Sprintf("This command is only available from these channels %v", config.Values.WarPlanningChannels),
+				},
+			})
+		}
+	}),
+	MessageHandler: disgolf.MessageHandlerFunc(func(ctx *disgolf.MessageCtx) {
+		_, _ = ctx.Reply(fmt.Sprintf("In MessageHandler: MessageCtx: %v\n", ctx), true)
+	}),
+
+	// Middlewares array executes (before? after?) a / command handler. because???
+	Middlewares: []disgolf.Handler{
+		disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
+			fmt.Printf("In Middleware Ctx: %v\n", ctx)
+			ctx.Next()
+		}),
+	},
+}
+
+var RefreshAssignment = &disgolf.Command{
+	Name:        "refreshassignments",
+	Description: "Refresh the species war assignment cache from the data source",
+	Type:        discordgo.ChatApplicationCommand,
+	Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
+		// TODO: replace this with a query against the managers role
+		canRefresh := []string{"bionic_turkey", "iknyc", "gaze3", "mehhhhhhhhhhhhhhhhhhhhhhhhhhhhh"}
+		thisChan, err := ctx.Channel(ctx.Interaction.ChannelID)
+		// TODO: replace this when Check is available everywhere
+		if err != nil {
+			panic(err)
+		}
+
+		name := ctx.Interaction.Member.User.Username
+		log.Infow("In Handler", "command", "refreshassignments", "channel", thisChan.Name, "user", name)
+		if slices.Contains(canRefresh, name) {
+			_ = ctx.Respond(&discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "Refreshing assignment cache.",
+				},
+			})
+			CacheAssignments()
+			// TODO: this doesn't come out if placed here. Should exist at the end of CacheAssignments() anyway. Make it happen.
+			// _ = ctx.Respond(&discordgo.InteractionResponse{
+			// 	Type: discordgo.InteractionResponseChannelMessageWithSource,
+			// 	Data: &discordgo.InteractionResponseData{
+			// 		Content: "Assignment cache updated.",
+			// 	},
+			// })
+		} else {
+			_ = ctx.Respond(&discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "This command is not available to this user in this context.",
 				},
 			})
 		}
@@ -57,6 +110,7 @@ var MyAssignment = &disgolf.Command{
 }
 
 func getAssignmentMessage(name string) (assignMsg string) {
+	// TODO: Replace this with a role query to find "managers" role ID
 	assignMsg = "Sorry bud, I don't know who you are. Paging <@&1154960752004845646> for assistance."
 	assign, found := assignments[name]
 	if found {
