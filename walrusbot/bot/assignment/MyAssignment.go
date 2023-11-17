@@ -96,21 +96,10 @@ var RefreshAssignment = &disgolf.Command{
 			})
 		}
 	}),
-	MessageHandler: disgolf.MessageHandlerFunc(func(ctx *disgolf.MessageCtx) {
-		_, _ = ctx.Reply(fmt.Sprintf("In MessageHandler: MessageCtx: %v\n", ctx), true)
-	}),
-
-	// Middlewares array executes (before? after?) a / command handler. because???
-	Middlewares: []disgolf.Handler{
-		disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-			fmt.Printf("In Middleware Ctx: %v\n", ctx)
-			ctx.Next()
-		}),
-	},
 }
 
 func getAssignmentMessage(name string) (assignMsg string) {
-	// TODO: Replace this with a role query to find "managers" role ID
+	// TODO: grab the manager roleid dynamically. allow config for role(s?) to mention
 	assignMsg = "Sorry bud, I don't know who you are. Paging <@&1154960752004845646> for assistance."
 	assign, found := assignments[name]
 	if found {

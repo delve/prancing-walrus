@@ -3,6 +3,7 @@
 # TODO
 * containerize somehow. this "run from the repo" business is junk. cloudrun was more $$ than free tier GCE (because it's optimized for webhosts) but i think GCE can start from a container image?
 * log to gcloud. and maybe also a file, but roll it in the code.
+* reorganize with https://github.com/FedorLap2006/disgolf/blob/master/examples/modules/main.go
 * timestamp the cache, auto update it (daily?)
 * update the cache once (if older than (3?)hours) when someone is missing an assignment
 * grab the roleid for `manager` dynamically
