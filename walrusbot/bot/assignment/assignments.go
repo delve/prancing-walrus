@@ -29,10 +29,21 @@ type assignment struct {
 	 consider making this configurable or perhaps dynamic
 		 certainly the end column might need to be. not sure what to do with the sheet name
 */
-const (
-	headerRange = "Roster!A1:P1"
-	dataRange   = "Roster!A2:P"
-)
+
+type rosterTab struct {
+	club, tabname, headerRange, dataRange string
+}
+
+var dataTabs = []rosterTab{
+	{club: "Escargot",
+		tabname:     "Roster",
+		headerRange: "A1:P1",
+		dataRange:   "A2:P"},
+	{club: "Silken Pagoda",
+		tabname:     "Silken Roster",
+		headerRange: "A1:P1",
+		dataRange:   "A2:P"},
+}
 
 func CacheAssignments() {
 	log.Infow("Caching assignment data")
@@ -52,57 +63,33 @@ func CacheAssignments() {
 	srv, err := sheets.NewService(ctx, option.WithAPIKey(config.Values.APIKey))
 	check.Err(err, "Unable to retrieve Sheets client")
 
-	// Prints the names and majors of students in a sample spreadsheet:
-	// https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
+	// Example https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
 	spreadsheetId := config.Values.SheetId
-	headerData, err := srv.Spreadsheets.Values.Get(spreadsheetId, headerRange).Do()
-	check.Err(err, "Unable to retrieve data from sheet")
-	if len(headerData.Values) != 1 {
-		log.Fatalw("inconcievable! header rows != 1", "headerRowsFound", len(headerData.Values), "data", headerData.Values)
-	}
-	headers := headerData.Values[0]
-	log.Infow("sheet headers retrieved", "headers", headerData.Values, "colA", headers[0])
+	for _, tab := range dataTabs {
+		headerRange := fmt.Sprintf("'%s'!%s", tab.tabname, tab.headerRange)
+		headerData, err := srv.Spreadsheets.Values.Get(spreadsheetId, headerRange).Do()
+		check.Err(err, "Unable to retrieve data from sheet")
+		if len(headerData.Values) != 1 {
+			log.Fatalw("inconcievable! header rows != 1", "headerRowsFound", len(headerData.Values), "data", headerData.Values)
+		}
 
-	playerData, err := srv.Spreadsheets.Values.Get(spreadsheetId, dataRange).Do()
-	check.Err(err, "Unable to retrieve data from sheet")
+		headers := headerData.Values[0]
+		log.Infow("sheet headers retrieved", "club", tab.club, "headers", headerData.Values, "colA", headers[0])
 
-	if len(playerData.Values) == 0 {
-		log.Fatalw("inconcievable! no player data", "playerRowsFound", len(playerData.Values), "data", playerData.Values)
-	} else {
+		dataRange := fmt.Sprintf("'%s'!%s", tab.tabname, tab.dataRange)
+		playerData, err := srv.Spreadsheets.Values.Get(spreadsheetId, dataRange).Do()
+		check.Err(err, "Unable to retrieve data from sheet")
+
+		if len(playerData.Values) == 0 {
+			log.Fatalw("inconcievable! no player data", "playerRowsFound", len(playerData.Values), "data", playerData.Values)
+		}
+
 		for _, playerRecord := range playerData.Values {
-			player := make(map[string]string)
-			for element, val := range playerRecord {
-				player[headers[element].(string)] = val.(string)
-			}
-
-			/* abstracting some values away from the data because some of them are empty in the sheet.
-			   this causes the array to be truncated so calling playerRecord[1] results in an
-			   index out of range error. if it's missing just make it blank for now.
-			*/
-			name := ""
-			if len(playerRecord) >= 2 {
-				name = playerRecord[1].(string)
-			}
-
-			role := ""
-			if len(playerRecord) >= 4 {
-				role = playerRecord[3].(string)
-			}
-
-			gather := ""
-			if len(playerRecord) >= 5 {
-				gather = playerRecord[4].(string)
-			}
-
-			assignments[playerRecord[0].(string)] = assignment{
-				gameName:        name,
-				role:            role,
-				gather:          gather,
-				canUseClamMagic: false,
-				data:            player,
-			}
+			log.Infow("got player", "club", tab.club, "player", playerRecord[1].(string), "disco", playerRecord[0].(string))
+			assignments[playerRecord[0].(string)] = makeAssignmentRecord(playerRecord, headers)
 		}
 	}
+
 	keys := make([]string, len(assignments))
 
 	i := 0
@@ -111,6 +98,43 @@ func CacheAssignments() {
 		i++
 	}
 	log.Infow("player data cached", "total players loaded", len(assignments), "players", keys)
+}
+
+func makeAssignmentRecord(playerRecord, headers []interface{}) assignment {
+	player := make(map[string]string)
+	for element, val := range playerRecord {
+		player[headers[element].(string)] = val.(string)
+	}
+
+	/* abstracting some values away from the data because some of them are empty in the sheet.
+	   this causes the array to be truncated so calling playerRecord[1] results in an
+	   index out of range error. if it's missing just make it blank for now.
+	*/
+	name := ""
+	if len(playerRecord) >= 2 {
+		name = playerRecord[1].(string)
+	}
+
+	role := ""
+	if len(playerRecord) >= 4 {
+		role = playerRecord[3].(string)
+		if role == "" {
+			role = "Prospector" // TODO: Wouldbe better if role was explicit.
+		}
+	}
+
+	gather := ""
+	if len(playerRecord) >= 5 {
+		gather = playerRecord[4].(string)
+	}
+
+	return assignment{
+		gameName:        name,
+		role:            role,
+		gather:          gather,
+		canUseClamMagic: false,
+		data:            player,
+	}
 }
 
 // OAUTH2 shite below here. may not need it.
