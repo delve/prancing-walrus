@@ -85,7 +85,6 @@ func CacheAssignments() {
 		}
 
 		for _, playerRecord := range playerData.Values {
-			log.Infow("got player", "club", tab.club, "player", playerRecord[1].(string), "disco", playerRecord[0].(string))
 			assignments[playerRecord[0].(string)] = makeAssignmentRecord(playerRecord, headers)
 		}
 	}
