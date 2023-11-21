@@ -1,5 +1,9 @@
 # prancing-walrus
 
+# tab notes
+* containers on VMs: https://cloud.google.com/compute/docs/containers/deploying-containers#:~:text=Deploying%20a%20container%20on%20a%20new%20VM%20instance,-You%20can%20deploy&text=Go%20to%20the%20Create%20an%20instance%20page.&text=Specify%20the%20VM%20details.,the%20container%20for%20your%20needs.
+* 
+
 # TODO
 ## Before Master
 * containerize somehow. this "run from the repo" business is junk. cloudrun was more $$ than free tier GCE (because it's optimized for webhosts) but i think GCE can start from a container image?
