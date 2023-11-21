@@ -2,8 +2,9 @@
 
 # TODO
 ## Before Master
-* log to gcloud. and maybe also a file, but roll it in the code.
 * containerize somehow. this "run from the repo" business is junk. cloudrun was more $$ than free tier GCE (because it's optimized for webhosts) but i think GCE can start from a container image?
+* * setup image repo in gcp. confirm VM from image function. then make it so.
+* log to gcloud. and maybe also a file, but roll it in the code.
 ## After Master
 * reorganize with https://github.com/FedorLap2006/disgolf/blob/master/examples/modules/main.go
 * automatic recaching once when someone is missing an assignment (if older than (3?)hours)
