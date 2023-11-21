@@ -1,16 +1,18 @@
 # prancing-walrus
 
 # TODO
-* containerize somehow. this "run from the repo" business is junk. cloudrun was more $$ than free tier GCE (because it's optimized for webhosts) but i think GCE can start from a container image?
+## Before Master
 * log to gcloud. and maybe also a file, but roll it in the code.
+* containerize somehow. this "run from the repo" business is junk. cloudrun was more $$ than free tier GCE (because it's optimized for webhosts) but i think GCE can start from a container image?
+## After Master
 * reorganize with https://github.com/FedorLap2006/disgolf/blob/master/examples/modules/main.go
-* timestamp the cache, auto update it (daily?)
-* update the cache once (if older than (3?)hours) when someone is missing an assignment
+* automatic recaching once when someone is missing an assignment (if older than (3?)hours)
+* automatic recaching every 24 hours (if older than (3?)hours)
+* backoff retry on recaching
 * grab the roleid for `manager` dynamically
 * make log messages show correct caller, not `"caller":"log/log.go:20"`
-* enable recaching
-* enable user updates. include failsafe for values out of bounds
 * make all config values read from env and default to configfile if not found
+* enable user updates. include failsafe for values out of bounds
 
 # Perms nded
 Scope: Bot
