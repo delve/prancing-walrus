@@ -1,2 +1,7 @@
+tasks:
+  - name: Setup
+    before: chmod ugo+w /var/run/docker.sock
+    command: chmod ugo+w /var/run/docker.sock
+
 image:
     file: .gitpod.Dockerfile
