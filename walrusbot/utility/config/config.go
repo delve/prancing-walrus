@@ -7,7 +7,7 @@ import (
 	"walrusbot/utility/log"
 )
 
-const defaultParameterFile = "../config.json"
+const defaultParameterFile = "./config.json"
 
 var Values *ConfigStruct
 
