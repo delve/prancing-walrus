@@ -19,6 +19,7 @@ https://gitpod.io/#https://github.com/delve/prancing-walrus
 * make log messages show correct caller, not `"caller":"log/log.go:20"`
 * make all config values read from env and default to configfile if not found
 * enable user updates. include failsafe for values out of bounds
+* in config the values pulled from env should be tested, if len == 0 panic
 
 # Perms nded
 Scope: Bot
