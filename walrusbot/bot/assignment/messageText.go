@@ -33,6 +33,11 @@ var canNotUseClamMagicTxt = []string{
 }
 
 var canUseClamMagicTxt = []string{
-	"If it's a clam war this week please use spells as you see fit.",
-	"If you're seeing the clams this week make sure those other bastards **suffer**.",
+	"If it's a clam war this week please use spells as you see fit.\n",
+	"If you're seeing the clams this week make sure those other bastards **suffer**.\n",
+}
+
+var closing = []string{
+	"\nGood luck out there!",
+	"\nJackass.",
 }

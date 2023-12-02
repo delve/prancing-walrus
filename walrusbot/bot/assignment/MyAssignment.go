@@ -145,6 +145,7 @@ func getAssignmentMessage(name string, sass bool) (assignMsg string) {
 		} else {
 			sb.WriteString(canNotUseClamMagicTxt[tone])
 		}
+		sb.WriteString(closing[tone])
 		assignMsg = sb.String()
 	}
 	return
