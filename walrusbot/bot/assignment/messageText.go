@@ -9,7 +9,7 @@ var noAssignmentTxt = []string{
 var noKitAssignmentTxt = []string{
 	// TODO: grab the manager roleid dynamically. allow config for role(s?) to mention
 	"Looks like you don't have a kit assignment yet. Paging <@&1154960752004845646> for assistance. ",
-	"Hey <@&1154960752004845646>! This joker does have a kit yet. Do yer job already! ",
+	"Hey <@&1154960752004845646>! This joker doesn't have a kit yet. Do yer job already! ",
 }
 
 var kitAssignmentTxt = []string{
@@ -39,5 +39,5 @@ var canUseClamMagicTxt = []string{
 
 var closing = []string{
 	"\nGood luck out there!",
-	"\nJackass.",
+	"\nJackass.\n~With Love~ ~gaze",
 }
