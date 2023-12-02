@@ -31,6 +31,7 @@ func main() {
 	assignment.CacheAssignments()
 
 	bot.Router.Register(botcommands.MyAssignment)
+	bot.Router.Register(botcommands.MyAss)
 	bot.Router.Register(botcommands.RefreshAssignment)
 
 	bot.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
@@ -39,7 +40,7 @@ func main() {
 	bot.AddHandler(bot.Router.HandleInteraction)
 	bot.AddHandler(bot.Router.MakeMessageHandler(&disgolf.MessageHandlerConfig{
 		// TODO: tidy this
-		Prefixes:      []string{"d.", "dis.", "disgolf."},
+		Prefixes:      []string{"w.", "walrus."},
 		MentionPrefix: true,
 	}))
 

@@ -3,6 +3,7 @@ package assignment
 import (
 	"fmt"
 	"strings"
+	"walrusbot/utility/check"
 	"walrusbot/utility/config"
 	"walrusbot/utility/log"
 
@@ -17,32 +18,27 @@ var MyAssignment = &disgolf.Command{
 	Description: "Get your species war assignments",
 	Type:        discordgo.ChatApplicationCommand,
 	Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-		// fmt.Printf("In Handler CTX: %v\n", ctx)
-		// fmt.Printf("In Handler interaction: %v\n", ctx.Interaction.ChannelID)
-		thisChan, err := ctx.Channel(ctx.Interaction.ChannelID)
-		// TODO: replace this when Check is available everywhere
-		if err != nil {
-			panic(err)
-		}
+		requestAssignment(ctx, false)
+	}),
+	MessageHandler: disgolf.MessageHandlerFunc(func(ctx *disgolf.MessageCtx) {
+		_, _ = ctx.Reply(fmt.Sprintf("In MessageHandler: MessageCtx: %v\n", ctx), true)
+	}),
 
-		name := ctx.Interaction.Member.User.Username
-		log.Infow("In Handler", "command", "myassignment", "channel", thisChan.Name, "user", name)
-		if slices.Contains(config.Values.WarPlanningChannels, thisChan.Name) {
-			// get the username
-			_ = ctx.Respond(&discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content: getAssignmentMessage(name),
-				},
-			})
-		} else {
-			_ = ctx.Respond(&discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content: fmt.Sprintf("This command is only available from these channels %v", config.Values.WarPlanningChannels),
-				},
-			})
-		}
+	// Middlewares array executes (before? after?) a / command handler. because???
+	Middlewares: []disgolf.Handler{
+		disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
+			fmt.Printf("In Middleware Ctx: %v\n", ctx)
+			ctx.Next()
+		}),
+	},
+}
+
+var MyAss = &disgolf.Command{
+	Name:        "myass",
+	Description: "Get your species war assignments",
+	Type:        discordgo.ChatApplicationCommand,
+	Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
+		requestAssignment(ctx, true)
 	}),
 	MessageHandler: disgolf.MessageHandlerFunc(func(ctx *disgolf.MessageCtx) {
 		_, _ = ctx.Reply(fmt.Sprintf("In MessageHandler: MessageCtx: %v\n", ctx), true)
@@ -98,31 +94,56 @@ var RefreshAssignment = &disgolf.Command{
 	}),
 }
 
-func getAssignmentMessage(name string) (assignMsg string) {
-	// TODO: grab the manager roleid dynamically. allow config for role(s?) to mention
-	assignMsg = "Sorry bud, I don't know who you are. Paging <@&1154960752004845646> for assistance."
+func requestAssignment(ctx *disgolf.Ctx, sass bool) {
+	thisChan, err := ctx.Channel(ctx.Interaction.ChannelID)
+	check.Err(err)
+
+	name := ctx.Interaction.Member.User.Username
+	log.Infow("In Handler", "command", "myassignment", "channel", thisChan.Name, "user", name)
+	if slices.Contains(config.Values.WarPlanningChannels, thisChan.Name) {
+		// get the username
+		_ = ctx.Respond(&discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: getAssignmentMessage(name, sass),
+			},
+		})
+	} else {
+		_ = ctx.Respond(&discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: fmt.Sprintf("This command is only available from these channels %v", config.Values.WarPlanningChannels),
+			},
+		})
+	}
+}
+
+func getAssignmentMessage(name string, sass bool) (assignMsg string) {
+	tone := 0
+	if sass {
+		tone = 1
+	}
+	assignMsg = noAssignmentTxt[tone]
 	assign, found := assignments[name]
 	if found {
 		var sb strings.Builder
 		sb.WriteString(fmt.Sprintf("Hi %s! ", assign.gameName))
 		if assign.role == "" {
-			// TODO: grab the manager roleid dynamically. allow config for role(s?) to mention
-			sb.WriteString("Looks like you don't have a kit assignment yet. Paging <@&1154960752004845646> for assistance. ")
+			sb.WriteString(noKitAssignmentTxt[tone])
 		} else {
-			sb.WriteString(fmt.Sprintf("You're assigned to the %s kit. ", assign.role))
+			sb.WriteString(fmt.Sprintf(kitAssignmentTxt[tone], assign.role))
 		}
 
 		if assign.gather == "" {
-			// TODO: grab the manager roleid dynamically. allow config for role(s?) to mention
-			sb.WriteString("Looks like you haven't been assigned a fossil to gather yet. Please gather whatever fossil type we seem have the fewest of.\n")
+			sb.WriteString(noFossilAssignmentTxt[tone])
 		} else {
-			sb.WriteString(fmt.Sprintf("Please gather fossil %s.\n", assign.gather))
+			sb.WriteString(fmt.Sprintf(fossilAssignmentTxt[tone], assign.gather))
 		}
 
 		if assign.canUseClamMagic {
-			sb.WriteString("If it's a clam war this week please use spells as you see fit.")
+			sb.WriteString(canUseClamMagicTxt[tone])
 		} else {
-			sb.WriteString("If it's a clam war this week please use both grow spells, but none of the others.")
+			sb.WriteString(canNotUseClamMagicTxt[tone])
 		}
 		assignMsg = sb.String()
 	}
