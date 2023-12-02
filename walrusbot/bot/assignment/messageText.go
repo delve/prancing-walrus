@@ -39,5 +39,5 @@ var canUseClamMagicTxt = []string{
 
 var closing = []string{
 	"\nGood luck out there!",
-	"\nJackass.\n~With Love~ ~gaze",
+	"\nJackass.\n~With Love~\n~gaze",
 }
