@@ -2,15 +2,11 @@ package assignment
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"net/http"
-	"os"
 	"walrusbot/utility/check"
 	"walrusbot/utility/config"
 	"walrusbot/utility/log"
 
-	"golang.org/x/oauth2"
 	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
 )
@@ -137,6 +133,7 @@ func makeAssignmentRecord(playerRecord, headers []interface{}) assignment {
 }
 
 // OAUTH2 shite below here. may not need it.
+/*
 // Retrieve a token, saves the token, then returns the generated client.
 func getClient(config *oauth2.Config) *http.Client {
 	// The file token.json stores the user's access and refresh tokens, and is
@@ -191,3 +188,4 @@ func saveToken(path string, token *oauth2.Token) {
 	defer f.Close()
 	json.NewEncoder(f).Encode(token)
 }
+*/
