@@ -63,7 +63,7 @@ var RefreshAssignment = &disgolf.Command{
 	Type:        discordgo.ChatApplicationCommand,
 	Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
 		// TODO: replace this with a query against the managers role
-		canRefresh := []string{"bionic_turkey", "iknyc", "gaze3", "mehhhhhhhhhhhhhhhhhhhhhhhhhhhhh"}
+		canRefresh := []string{"bionic_turkey", "iknyc", "dustinj", "gaze3", "fedcode", "mehhhhhhhhhhhhhhhhhhhhhhhhhhhhh", "vinnydev", "na000."}
 		thisChan, err := ctx.Channel(ctx.Interaction.ChannelID)
 		// TODO: replace this when Check is available everywhere
 		if err != nil {
