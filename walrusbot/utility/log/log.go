@@ -20,6 +20,10 @@ func Infow(msg string, keysAndValues ...interface{}) {
 	Logger.Infow(msg, keysAndValues...)
 }
 
+func Warnw(msg string, keysAndValues ...interface{}) {
+	Logger.Warnw(msg, keysAndValues...)
+}
+
 func Fatalw(msg string, keysAndValues ...interface{}) {
 	Logger.Fatalw(msg, keysAndValues...)
 }

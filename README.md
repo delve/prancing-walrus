@@ -11,6 +11,8 @@ https://gitpod.io/#https://github.com/delve/prancing-walrus
 * * setup image repo in gcp. confirm VM from image function. then make it so.
 * log to gcloud. and maybe also a file, but roll it in the code.
 ## After Master
+* replace as many Panics as possible with proper error handling
+* on /refreshassignments add a discord name check and warn on incorrect names.
 * reorganize with https://github.com/FedorLap2006/disgolf/blob/master/examples/modules/main.go
 * automatic recaching once when someone is missing an assignment (if older than (3?)hours)
 * automatic recaching every 24 hours (if older than (3?)hours)

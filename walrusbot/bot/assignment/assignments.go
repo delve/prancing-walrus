@@ -96,11 +96,6 @@ func CacheAssignments() {
 }
 
 func makeAssignmentRecord(playerRecord, headers []interface{}) assignment {
-	player := make(map[string]string)
-	for element, val := range playerRecord {
-		player[headers[element].(string)] = val.(string)
-	}
-
 	/* abstracting some values away from the data because some of them are empty in the sheet.
 	   this causes the array to be truncated so calling playerRecord[1] results in an
 	   index out of range error. if it's missing just make it blank for now.
@@ -108,6 +103,16 @@ func makeAssignmentRecord(playerRecord, headers []interface{}) assignment {
 	name := ""
 	if len(playerRecord) >= 2 {
 		name = playerRecord[1].(string)
+	}
+
+	player := make(map[string]string)
+	for element, val := range playerRecord {
+		// protect against "unheadered" columns
+		if element < len(headers) {
+			player[headers[element].(string)] = val.(string)
+		} else {
+			log.Warnw("unheadered column ignored", "player", name, "headerCount", len(headers), "columnNumZeroBase", element)
+		}
 	}
 
 	role := ""
