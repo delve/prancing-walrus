@@ -12,6 +12,8 @@ https://gitpod.io/#https://github.com/delve/prancing-walrus
 * log to gcloud. and maybe also a file, but roll it in the code.
 ## After Master
 * replace as many Panics as possible with proper error handling
+* Add backoff-retry logic around accessing the spreadsheet
+* Look into backoff-retry in the discord commands, to recover from discord outages
 * on /refreshassignments add a discord name check and warn on incorrect names.
 * reorganize with https://github.com/FedorLap2006/disgolf/blob/master/examples/modules/main.go
 * automatic recaching once when someone is missing an assignment (if older than (3?)hours)
