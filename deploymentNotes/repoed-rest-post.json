@@ -1,0 +1,138 @@
+{
+  "canIpForward": false,
+  "confidentialInstanceConfig": {
+    "enableConfidentialCompute": false
+  },
+  "cpuPlatform": "Unknown CPU Platform",
+  "creationTimestamp": "2023-11-04T07:25:41.305-07:00",
+  "deletionProtection": false,
+  "description": "",
+  "disks": [
+    {
+      "architecture": "X86_64",
+      "guestOsFeatures": [
+        {
+          "type": "UEFI_COMPATIBLE"
+        },
+        {
+          "type": "VIRTIO_SCSI_MULTIQUEUE"
+        },
+        {
+          "type": "GVNIC"
+        },
+        {
+          "type": "SEV_CAPABLE"
+        }
+      ],
+      "type": "PERSISTENT",
+      "licenses": [
+        "projects/debian-cloud/global/licenses/debian-11-bullseye"
+      ],
+      "deviceName": "instance-1",
+      "autoDelete": true,
+      "source": "projects/prancingwalrus/zones/us-central1-a/disks/instance-1",
+      "index": 0,
+      "boot": true,
+      "kind": "compute#attachedDisk",
+      "mode": "READ_WRITE",
+      "interface": "SCSI",
+      "diskSizeGb": "10"
+    }
+  ],
+  "displayDevice": {
+    "enableDisplay": false
+  },
+  "fingerprint": "vAtuKDOYjHk=",
+  "id": "2100367559267969676",
+  "keyRevocationActionType": "NONE",
+  "kind": "compute#instance",
+  "labelFingerprint": "42WmSpB8rSM=",
+  "lastStartTimestamp": "2023-11-26T23:53:41.989-08:00",
+  "lastStopTimestamp": "2023-12-17T08:55:58.449-08:00",
+  "machineType": "projects/prancingwalrus/zones/us-central1-a/machineTypes/e2-micro",
+  "metadata": {
+    "fingerprint": "3w2TWp94jsM=",
+    "kind": "compute#metadata",
+    "items": [
+      {
+        "value": "export BOT_TOKEN=<insert BOT_TOKEN here>\nexport APIKey=<insert APIKey here>\nexport GOCACHE='/home/delve202/.cache/go-build'\nexport GOMODCACHE='/home/delve202/go/pkg/mod'\nexport GOPATH='/home/delve202/go'\ncd /home/delve202/prancing-walrus/walrusbot\necho \"---------\" >> /tmp/log.txt\necho \"STARTUP\" >> /tmp/log.txt\necho \"---------\" >> /tmp/log.txt\n#echo \"---------\" >> /tmp/log.txt\n#echo \"Git Pull\" >> /tmp/log.txt\n#echo \"---------\" >> /tmp/log.txt\n#git config --global --add safe.directory /home/delve202/prancing-walrus\n#git pull &>> /tmp/log.txt\necho \"---------\" >> /tmp/log.txt\necho \"Go Env\" >> /tmp/log.txt\necho \"---------\" >> /tmp/log.txt\n/usr/local/go/bin/go env &>> /tmp/log.txt\necho \"---------\" >> /tmp/log.txt\necho \"Go Run\" >> /tmp/log.txt\necho \"---------\" >> /tmp/log.txt\n/usr/local/go/bin/go run . &>> /tmp/log.txt",
+        "key": "startup-script"
+      },
+      {
+        "value": "delve202:ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBBDhSTpta23q4hF1ga9Q2PJC7nhb8sndDYcpDzBNVTCiNHwrgyYQgBJsKqnrIYvOmRWGbIVhp/4bKiE++D7m2G0= google-ssh {\"userName\":\"delve202@gmail.com\",\"expireOn\":\"2023-12-16T09:58:39+0000\"}\ndelve202:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCtMgz+SVp7LJ+KepRfj67OPVscyDfICGeyM4mF6FQkhy5i+PGVJ3NTEFOILXMJ0xx1gxdaaveBHfcb3ekTcmmNRcpATPLpXU3u5dwI0jqG96tN2l3D2ZIJHZ3B4ZT1kvCEEFL1XjoPgHGBzVWDlte6BzN5GXQ2RzD0uXLagZedscRMbK4eS7EA4PlPAjaJ/Jeb2ZKy0yZvQ7xS62Q+fyaHaVKkfDhoe43NiI7zQU41Xd10/Q8OSkLf4EgYC8wDlKSHrV+BwZZK0e7nFcQexiLjZiUcgphwJV5IyeEtkPOvEBnEf2tsXBKPUTYw9S64AelWTgg1zVr9evj1AaTBnrsN google-ssh {\"userName\":\"delve202@gmail.com\",\"expireOn\":\"2023-12-16T09:58:55+0000\"}",
+        "key": "ssh-keys"
+      }
+    ]
+  },
+  "name": "instance-1",
+  "networkInterfaces": [
+    {
+      "stackType": "IPV4_ONLY",
+      "name": "nic0",
+      "network": "projects/prancingwalrus/global/networks/default",
+      "accessConfigs": [
+        {
+          "name": "External NAT",
+          "type": "ONE_TO_ONE_NAT",
+          "kind": "compute#accessConfig",
+          "networkTier": "PREMIUM"
+        }
+      ],
+      "subnetwork": "projects/prancingwalrus/regions/us-central1/subnetworks/default",
+      "networkIP": "10.128.0.2",
+      "fingerprint": "8DAIYCxeDQE=",
+      "kind": "compute#networkInterface"
+    }
+  ],
+  "reservationAffinity": {
+    "consumeReservationType": "ANY_RESERVATION"
+  },
+  "resourceStatus": {
+    "scheduling": {}
+  },
+  "scheduling": {
+    "onHostMaintenance": "MIGRATE",
+    "provisioningModel": "STANDARD",
+    "automaticRestart": true,
+    "preemptible": false
+  },
+  "selfLink": "projects/prancingwalrus/zones/us-central1-a/instances/instance-1",
+  "serviceAccounts": [
+    {
+      "email": "883671929937-compute@developer.gserviceaccount.com",
+      "scopes": [
+        "https://www.googleapis.com/auth/devstorage.read_only",
+        "https://www.googleapis.com/auth/logging.write",
+        "https://www.googleapis.com/auth/monitoring.write",
+        "https://www.googleapis.com/auth/servicecontrol",
+        "https://www.googleapis.com/auth/service.management.readonly",
+        "https://www.googleapis.com/auth/trace.append"
+      ]
+    }
+  ],
+  "shieldedInstanceConfig": {
+    "enableSecureBoot": false,
+    "enableVtpm": true,
+    "enableIntegrityMonitoring": true
+  },
+  "shieldedInstanceIntegrityPolicy": {
+    "updateAutoLearnPolicy": true
+  },
+  "shieldedVmConfig": {
+    "enableSecureBoot": false,
+    "enableVtpm": true,
+    "enableIntegrityMonitoring": true
+  },
+  "shieldedVmIntegrityPolicy": {
+    "updateAutoLearnPolicy": true
+  },
+  "startRestricted": false,
+  "status": "TERMINATED",
+  "tags": {
+    "items": [
+      "https-server"
+    ],
+    "fingerprint": "nNZ0SA7CJyk="
+  },
+  "zone": "projects/prancingwalrus/zones/us-central1-a"
+}

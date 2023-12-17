@@ -1,0 +1,13 @@
+{
+    "Token": "", 
+    "APIKey": "",
+    "BotPrefix": ["w.", "walrus."],
+    "AppId": "1169332084813348865",
+    "ServerId": "",
+    "WarPlanningChannels": [
+        "🧬・species-war",
+        "👥・species-war",
+        "🏯・species-war"
+    ],
+    "SheetId": "1kulg2agXhCRbrdYDtYf5ggq_8U2yWkib_gxUx7mV2II"
+}

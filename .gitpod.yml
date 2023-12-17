@@ -1,0 +1,7 @@
+tasks:
+  - name: Setup
+    before: ./gitpodconfig/tasks/before.sh
+    command: ./gitpodconfig/tasks/command.sh
+
+image:
+    file: .gitpod.Dockerfile

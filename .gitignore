@@ -8,9 +8,6 @@
 *.so
 *.dylib
 
-# bot user's OAuth token file. Don't put it anywhere else
-token.txt
-
 # Test binary, built with `go test -c`
 *.test
 
