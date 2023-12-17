@@ -1,4 +1,4 @@
-POST https://www.googleapis.com/compute/v1/projects/prancingwalrus/zones/us-central1-a/instances
+// POST https://www.googleapis.com/compute/v1/projects/prancingwalrus/zones/us-central1-a/instances
 {
   "canIpForward": false,
   "confidentialInstanceConfig": {
