@@ -1,17 +1,16 @@
 https://gitpod.io/#https://github.com/delve/prancing-walrus
 # prancing-walrus
 ## TODO
-### Before Master
-* containerize somehow. this "run from the repo" business is junk. cloudrun was more $$ than free tier GCE (because it's optimized for webhosts) but i think GCE can start from a container image?
-* * setup image repo in gcp. confirm VM from image function. then make it so.
-* log to gcloud. and maybe also a file, but roll it in the code.
-### After Master
+### Before 1.0
+* automate version tagging & publishing (makefile)
+* automate deployment (makefile)
 * replace as many Panics as possible with proper error handling
 * on /refreshassignments add a discord name check and warn on incorrect names.
 * Add backoff-retry logic around accessing the spreadsheet
 * Look into backoff-retry in the discord commands, to recover from discord outages
-* reorganize with https://github.com/FedorLap2006/disgolf/blob/master/examples/modules/main.go
 * find a way to publish logs to walrus wranglers
+### After 1.0
+* reorganize with https://github.com/FedorLap2006/disgolf/blob/master/examples/modules/main.go ?
 * automatic recaching once when someone is missing an assignment (if older than (3?)hours)
 * automatic recaching every 24 hours (if older than (3?)hours)
 * backoff retry on recaching
