@@ -1,16 +1,11 @@
 https://gitpod.io/#https://github.com/delve/prancing-walrus
 # prancing-walrus
-
-# tab notes
-* containers on VMs: https://cloud.google.com/compute/docs/containers/deploying-containers#:~:text=Deploying%20a%20container%20on%20a%20new%20VM%20instance,-You%20can%20deploy&text=Go%20to%20the%20Create%20an%20instance%20page.&text=Specify%20the%20VM%20details.,the%20container%20for%20your%20needs.
-* 
-
-# TODO
-## Before Master
+## TODO
+### Before Master
 * containerize somehow. this "run from the repo" business is junk. cloudrun was more $$ than free tier GCE (because it's optimized for webhosts) but i think GCE can start from a container image?
 * * setup image repo in gcp. confirm VM from image function. then make it so.
 * log to gcloud. and maybe also a file, but roll it in the code.
-## After Master
+### After Master
 * replace as many Panics as possible with proper error handling
 * on /refreshassignments add a discord name check and warn on incorrect names.
 * Add backoff-retry logic around accessing the spreadsheet
@@ -27,7 +22,7 @@ https://gitpod.io/#https://github.com/delve/prancing-walrus
 * in config the values pulled from env should be tested, if len == 0 panic
 * setup a sidechannel method to restart the host VM. consider ways to manage container version through it as well
 
-# Perms nded
+# Discord perms nded
 Scope: Bot
 * Read messages/view channels
 * Send messages
@@ -35,12 +30,25 @@ Scope: Bot
 * Use external stickers
 * Add reactions
 * Use slash comands
+# Dev-ing
+## prereq
+set CONFIG, APIKey, and BOT_TOKEN env vars for this repo in gitpod user settings. CONFIG should be '../devconfig.json', BOT_TOKEN should be the bot token from Discord. Get yer own. The devconfig has a test app id and specific server id so as to not interfere with the 'production' bot.
 
+does app id need to be per dev also? worry about it when it's not just me. at some point consider loading both configs with merge/overwrite logic to reduce duplication
+## Run
+`F5` for interactive debugging in VSCode with the 'Launch Package' profile
+`make run` to compile and execute local code
+`make image` to create a buildpack image
+`make runimage` to run a local image
 # Hosting
 GCP GCE. cloud run was too expensive.
 
 * create project
 * enable GCE API
+* create image repo
+* * enable artifact registry api
+* * create docker registry colocated with GCE instance (usc1) with a cleanup policy keep latest 5 images. immutable tags seems to prevent deletion, so don't enable it
+* * 
 * create VM
 * * sudo apt install git
 * * curl --output /tmp/go1.21.3.linux-amd64.tar.gz https://dl.google.com/go/go1.21.3.linux-amd64.tar.gz
@@ -212,9 +220,3 @@ rest call to gen VM. note the token replace
   "zone": "projects/prancingwalrus/zones/us-central1-a"
 }
 ```
-
-# Dev-ing
-## prereq
-set CONFIG, APIKey, and BOT_TOKEN env vars for this repo in gitpod user settings. CONFIG should be '../devconfig.json', BOT_TOKEN should be the bot token from Discord. Get yer own. The devconfig has a test app id and specific server id so as to not interfere with the 'production' bot.
-
-does app id need to be per dev also? worry about it when it's not just me. at some point consider loading both configs with merge/overwrite logic to reduce duplication
