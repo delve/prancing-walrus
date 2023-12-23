@@ -50,6 +50,7 @@ func main() {
 		log.Fatalw("bot open exited with a error", "err", err)
 	}
 	defer bot.Close()
+
 	err = bot.Router.Sync(bot.Session, config.Values.AppId, config.Values.ServerId)
 	if err != nil {
 		log.Fatalw("cannot publish commands", "err", err)

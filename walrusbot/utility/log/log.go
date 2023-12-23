@@ -28,6 +28,10 @@ func Fatalw(msg string, keysAndValues ...interface{}) {
 	Logger.Fatalw(msg, keysAndValues...)
 }
 
+func Errorw(msg string, keysAndValues ...interface{}) {
+	Logger.Errorw(msg, keysAndValues...)
+}
+
 func getLogger() (err error) {
 	err = nil
 	// TODO: NewProduction is a canned set of production-ready configs for the logger.

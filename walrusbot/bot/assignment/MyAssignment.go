@@ -5,6 +5,7 @@ import (
 	"strings"
 	"walrusbot/utility/check"
 	"walrusbot/utility/config"
+	"walrusbot/utility/helpers"
 	"walrusbot/utility/log"
 
 	"golang.org/x/exp/slices"
@@ -18,6 +19,8 @@ var MyAssignment = &disgolf.Command{
 	Description: "Get your species war assignments",
 	Type:        discordgo.ChatApplicationCommand,
 	Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
+		thisChan, _ := ctx.Channel(ctx.Interaction.ChannelID)
+		log.Infow("In Handler", "command", "myassignment", "channel", thisChan.Name, "user", ctx.Interaction.Member.User.Username)
 		requestAssignment(ctx, false)
 	}),
 	MessageHandler: disgolf.MessageHandlerFunc(func(ctx *disgolf.MessageCtx) {
@@ -38,19 +41,13 @@ var MyAss = &disgolf.Command{
 	Description: "Get your species war assignments",
 	Type:        discordgo.ChatApplicationCommand,
 	Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
+		thisChan, _ := ctx.Channel(ctx.Interaction.ChannelID)
+		log.Infow("In Handler", "command", "myass", "channel", thisChan.Name, "user", ctx.Interaction.Member.User.Username)
 		requestAssignment(ctx, true)
 	}),
 	MessageHandler: disgolf.MessageHandlerFunc(func(ctx *disgolf.MessageCtx) {
 		_, _ = ctx.Reply(fmt.Sprintf("In MessageHandler: MessageCtx: %v\n", ctx), true)
 	}),
-
-	// Middlewares array executes (before? after?) a / command handler. because???
-	Middlewares: []disgolf.Handler{
-		disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-			fmt.Printf("In Middleware Ctx: %v\n", ctx)
-			ctx.Next()
-		}),
-	},
 }
 
 var RefreshAssignment = &disgolf.Command{
@@ -58,25 +55,20 @@ var RefreshAssignment = &disgolf.Command{
 	Description: "Refresh the species war assignment cache from the data source",
 	Type:        discordgo.ChatApplicationCommand,
 	Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-		// TODO: replace this with a query against the managers role
-		canRefresh := []string{"bionic_turkey", "iknyc", "dustinj", "gaze3", "fedcode", "mehhhhhhhhhhhhhhhhhhhhhhhhhhhhh", "vinnydev", "na000."}
 		thisChan, err := ctx.Channel(ctx.Interaction.ChannelID)
-		// TODO: replace this when Check is available everywhere
-		if err != nil {
-			panic(err)
+		check.Err(err)
+		log.Infow("In Handler", "command", "refreshassignments", "channel", thisChan.Name, "user", ctx.Interaction.Member.User.Username)
+
+		refreshRoleId, err := helpers.GetRoleId(ctx, config.Values.Roles["CanRefresh"])
+		if refreshRoleId == "" || err != nil {
+			log.Errorw("error finding role ID", "roleTag", "CanRefresh", "configuredRole", config.Values.Roles["CanRefresh"], "error", err)
+			return
 		}
 
-		name := ctx.Interaction.Member.User.Username
-		log.Infow("In Handler", "command", "refreshassignments", "channel", thisChan.Name, "user", name)
-		if slices.Contains(canRefresh, name) {
-			_ = ctx.Respond(&discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content: "Refreshing assignment cache.",
-				},
-			})
+		if helpers.CheckroleMembership(ctx, refreshRoleId) {
+			_ = ctx.Respond(helpers.GetDefaultResponse("Refreshing assignment cache.", false, ctx))
 			CacheAssignments()
-			// TODO: this doesn't come out if placed here. Should exist at the end of CacheAssignments() anyway. Make it happen.
+			// TODO: this doesn't come out if placed here. Make it happen.
 			// _ = ctx.Respond(&discordgo.InteractionResponse{
 			// 	Type: discordgo.InteractionResponseChannelMessageWithSource,
 			// 	Data: &discordgo.InteractionResponseData{
@@ -84,12 +76,7 @@ var RefreshAssignment = &disgolf.Command{
 			// 	},
 			// })
 		} else {
-			_ = ctx.Respond(&discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content: "This command is not available to this user in this context.",
-				},
-			})
+			_ = ctx.Respond(helpers.GetDefaultResponse("This command is not available to this user in this context.", true, ctx))
 		}
 	}),
 }
@@ -98,24 +85,10 @@ func requestAssignment(ctx *disgolf.Ctx, sass bool) {
 	thisChan, err := ctx.Channel(ctx.Interaction.ChannelID)
 	check.Err(err)
 
-	name := ctx.Interaction.Member.User.Username
-	log.Infow("In Handler", "command", "myassignment", "channel", thisChan.Name, "user", name)
 	if slices.Contains(config.Values.WarPlanningChannels, thisChan.Name) {
-		// get the username
-		_ = ctx.Respond(&discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Content: getAssignmentMessage(name, sass),
-				Flags:   discordgo.MessageFlagsEphemeral,
-			},
-		})
+		_ = ctx.Respond(helpers.GetDefaultResponse(getAssignmentMessage(ctx.Interaction.Member.User.Username, sass), true, ctx))
 	} else {
-		_ = ctx.Respond(&discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Content: fmt.Sprintf("This command is only available from these channels %v", config.Values.WarPlanningChannels),
-			},
-		})
+		_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("This command is only available from these channels %v", config.Values.WarPlanningChannels), true, ctx))
 	}
 }
 

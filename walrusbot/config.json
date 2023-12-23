@@ -9,5 +9,9 @@
         "👥・species-war",
         "🏯・species-war"
     ],
-    "SheetId": "1kulg2agXhCRbrdYDtYf5ggq_8U2yWkib_gxUx7mV2II"
+    "SheetId": "1kulg2agXhCRbrdYDtYf5ggq_8U2yWkib_gxUx7mV2II",
+    "Roles": {
+        "CaretakerRole": "Walrus Wranglers",
+        "CanRefresh": "Manager"
+    }
 }

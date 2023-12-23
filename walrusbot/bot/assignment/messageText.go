@@ -2,14 +2,14 @@ package assignment
 
 var noAssignmentTxt = []string{
 	// TODO: grab the manager roleid dynamically. allow config for role(s?) to mention
-	"Sorry bud, I don't know who you are. Paging <@&1154960752004845646> for assistance.",
-	"Okay wiseass, I don't know who you think you are but I'm paging <@&1154960752004845646> to teach you some manners.",
+	"Sorry bud, I don't know who you are. Paging <pingCaretakerRole> for assistance.",
+	"Okay wiseass, I don't know who you think you are but I'm paging <pingCaretakerRole> to teach you some manners.",
 }
 
 var noKitAssignmentTxt = []string{
 	// TODO: grab the manager roleid dynamically. allow config for role(s?) to mention
-	"Looks like you don't have a kit assignment yet. Paging <@&1154960752004845646> for assistance. ",
-	"Hey <@&1154960752004845646>! This joker doesn't have a kit yet. Do yer job already! ",
+	"Looks like you don't have a kit assignment yet. Paging <pingCaretakerRole> for assistance. ",
+	"Hey <pingCaretakerRole>! This joker doesn't have a kit yet. Do yer job already! ",
 }
 
 var kitAssignmentTxt = []string{
