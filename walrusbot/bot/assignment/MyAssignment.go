@@ -106,6 +106,7 @@ func requestAssignment(ctx *disgolf.Ctx, sass bool) {
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Content: getAssignmentMessage(name, sass),
+				Flags:   discordgo.MessageFlagsEphemeral,
 			},
 		})
 	} else {

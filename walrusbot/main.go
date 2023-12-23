@@ -38,11 +38,12 @@ func main() {
 		log.Infow("Bot is up!")
 	})
 	bot.AddHandler(bot.Router.HandleInteraction)
-	bot.AddHandler(bot.Router.MakeMessageHandler(&disgolf.MessageHandlerConfig{
-		// TODO: tidy this
-		Prefixes:      []string{"w.", "walrus."},
-		MentionPrefix: true,
-	}))
+	// lets just not respond to DMs at all for now.
+	// bot.AddHandler(bot.Router.MakeMessageHandler(&disgolf.MessageHandlerConfig{
+	// 	// TODO: tidy this
+	// 	Prefixes:      []string{"w.", "walrus."},
+	// 	MentionPrefix: true,
+	// }))
 
 	err = bot.Open()
 	if err != nil {
