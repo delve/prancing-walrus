@@ -10,6 +10,7 @@ https://gitpod.io/#https://github.com/delve/prancing-walrus
 * Look into backoff-retry in the discord commands, to recover from discord outages
 * find a way to publish logs to walrus wranglers
 ### After 1.0
+* extra tabs for adhoc notes. EG: what war is next, and a generic note.
 * reorganize with https://github.com/FedorLap2006/disgolf/blob/master/examples/modules/main.go ?
 * automatic recaching once when someone is missing an assignment (if older than (3?)hours)
 * automatic recaching every 24 hours (if older than (3?)hours)
