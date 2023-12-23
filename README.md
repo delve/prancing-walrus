@@ -15,7 +15,6 @@ https://gitpod.io/#https://github.com/delve/prancing-walrus
 * automatic recaching once when someone is missing an assignment (if older than (3?)hours)
 * automatic recaching every 24 hours (if older than (3?)hours)
 * backoff retry on recaching
-* grab the roleid for `manager` dynamically
 * make log messages show correct caller, not `"caller":"log/log.go:20"`
 * make all config values read from env and default to configfile if not found
 * enable user updates. include failsafe for values out of bounds
