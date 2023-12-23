@@ -12,13 +12,15 @@ const defaultParameterFile = "./config.json"
 var Values *ConfigStruct
 
 type ConfigStruct struct {
-	Token               string   `json:"Token"`
-	BotPrefix           []string `json:"BotPrefix"`
-	AppId               string   `json:"AppId"`
-	WarPlanningChannels []string `json:"WarPlanningChannels"`
-	ServerId            string   `json:"ServerId"` // Only set this if you want to limit the servers the bot talks to
-	SheetId             string   `json:"SheetId"`  // google spreadsheet data source
-	APIKey              string   `json:"APIKey"`   // get yer own!
+	Token               string            `json:"Token"`
+	BotPrefix           []string          `json:"BotPrefix"`
+	AppId               string            `json:"AppId"`
+	WarPlanningChannels []string          `json:"WarPlanningChannels"`
+	ServerId            string            `json:"ServerId"` // Only set this if you want to limit the servers the bot talks to
+	SheetId             string            `json:"SheetId"`  // google spreadsheet data source
+	APIKey              string            `json:"APIKey"`   // get yer own!
+	Roles               map[string]string `json:"Roles"`
+	// CaretakerRole       string   `json:"botCaretakerRole"`
 }
 
 func init() {

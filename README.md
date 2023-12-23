@@ -21,6 +21,7 @@ https://gitpod.io/#https://github.com/delve/prancing-walrus
 * enable user updates. include failsafe for values out of bounds
 * in config the values pulled from env should be tested, if len == 0 panic
 * setup a sidechannel method to restart the host VM. consider ways to manage container version through it as well
+* several spots that assume only one guild (EG ctx.Session.State.Guilds[0]). these should be fixed
 
 # Discord perms nded
 Scope: Bot

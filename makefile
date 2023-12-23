@@ -1,6 +1,6 @@
 .PHONY: image debug testimage runimage publish
 
-image:
+image: gcloudinit
 	cd walrusbot && pack build prancing-walrus --builder=gcr.io/buildpacks/builder 
 
 run:
@@ -11,8 +11,8 @@ runimage:
 
 
 publish: gcloudinit image
-	docker tag prancing-walrus us-central1-docker.pkg.dev/prancingwalrus/prancing-walrus/prancing-walrus:v0.01
-	docker push us-central1-docker.pkg.dev/prancingwalrus/prancing-walrus/prancing-walrus:v0.01
+	docker tag prancing-walrus us-central1-docker.pkg.dev/prancingwalrus/prancing-walrus/prancing-walrus:v0.03
+	docker push us-central1-docker.pkg.dev/prancingwalrus/prancing-walrus/prancing-walrus:v0.03
 
 gcloudinit: /tmp/gcloud.inited
 /tmp/gcloud.inited:
