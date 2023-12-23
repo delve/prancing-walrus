@@ -11,8 +11,8 @@ runimage:
 
 
 publish: gcloudinit image
-	docker tag prancing-walrus us-central1-docker.pkg.dev/prancingwalrus/prancing-walrus/prancing-walrus:v0.02
-	docker push us-central1-docker.pkg.dev/prancingwalrus/prancing-walrus/prancing-walrus:v0.02
+	docker tag prancing-walrus us-central1-docker.pkg.dev/prancingwalrus/prancing-walrus/prancing-walrus:v0.03
+	docker push us-central1-docker.pkg.dev/prancingwalrus/prancing-walrus/prancing-walrus:v0.03
 
 gcloudinit: /tmp/gcloud.inited
 /tmp/gcloud.inited:
