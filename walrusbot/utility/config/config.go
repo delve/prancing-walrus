@@ -9,19 +9,18 @@ import (
 
 const defaultParameterFile = "./config.json"
 
-var Values *ConfigStruct
-
 type ConfigStruct struct {
-	Token               string            `json:"Token"`
+	Secrets             secrets
+	GcpProject          string            `json:"GcpProject"`
 	BotPrefix           []string          `json:"BotPrefix"`
 	AppId               string            `json:"AppId"`
 	WarPlanningChannels []string          `json:"WarPlanningChannels"`
 	ServerId            string            `json:"ServerId"` // Only set this if you want to limit the servers the bot talks to
 	SheetId             string            `json:"SheetId"`  // google spreadsheet data source
-	APIKey              string            `json:"APIKey"`   // get yer own!
 	Roles               map[string]string `json:"Roles"`
-	// CaretakerRole       string   `json:"botCaretakerRole"`
 }
+
+var Values *ConfigStruct
 
 func init() {
 	err := readConfig()
@@ -30,10 +29,8 @@ func init() {
 
 func readConfig() (err error) {
 	err = nil
-	confFile := ""
-	if os.Getenv("CONFIG") == "" {
-		confFile = defaultParameterFile
-	} else {
+	confFile := defaultParameterFile
+	if os.Getenv("CONFIG") != "" {
 		confFile = os.Getenv("CONFIG")
 	}
 
@@ -48,17 +45,12 @@ func readConfig() (err error) {
 		return
 	}
 
-	if Values.Token == "" {
-		log.Infow("token not found in config.json; reading from environment")
-		Values.Token = os.Getenv("BOT_TOKEN")
-	}
-	log.Infow("found token", "length", len(Values.Token))
-
-	if Values.APIKey == "" {
-		log.Infow("API key not found in config.json; reading from environment")
-		Values.APIKey = os.Getenv("APIKey")
-	}
-	log.Infow("found key", "length", len(Values.APIKey))
-
+	err = get_secrets()
+	check.Err(err)
 	return
+}
+
+func Cleanup() {
+	// tidy up by deleting the SA key we created.
+	deleteKey(Values.Secrets.serviceAccountKey.Name)
 }

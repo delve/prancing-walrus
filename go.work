@@ -1,0 +1,10 @@
+go 1.21.5
+
+use (
+	./importWalrusDb
+	./walrusbot
+)
+
+replace github.com/delve/gsheets => /workspace/gsheets
+
+replace github.com/delve/sheetdb => /workspace/sheetdb

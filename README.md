@@ -1,6 +1,15 @@
 https://gitpod.io/#https://github.com/delve/prancing-walrus
 # prancing-walrus
+# YOU ARE HERE
+sheetdb/sheetdb.go line 103 is ass. When we breach the ratelimit for (sheets api? gcloud something? who knows or cares) the go routine PANICS (wtf) but the failure is captured and NILED for some reason, which allows any call to update the FUCKING DATABASE to fail silently with no notice to the calling function. Oh yes, it logs. WHOOPTY FUCKING DO I'M NOT WATCHING THE LOGS AND NEITHER IS MY CODE.
+
+So in short. Some options:
+1. make the damned thing synchronous. which sounds like a generically bad idea, especially in an app that streams user interaction
+2. figure out how the generation works (looks like AST wonkery) and change it to plumb some channels in for communication with the routine(s). this sounds hard, complicated, and long.
+3. something i haven't thought of yet.
+
 ## TODO
+* fix debug launch profile so it runs main.go for whichever module the active file is part of
 ### Before 1.0
 * automate version tagging & publishing (makefile)
 * automate deployment (makefile)
@@ -37,6 +46,17 @@ set CONFIG, APIKey, and BOT_TOKEN env vars for this repo in gitpod user settings
 does app id need to be per dev also? worry about it when it's not just me. at some point consider loading both configs with merge/overwrite logic to reduce duplication
 
 PROD BOT_TOKEN and sheets APIKey stored in GCP Secrets Manager
+
+* to enable local service account impersonation through ADC for dev work:
+* * mymail=the email address of your gcp user id
+* * prj=`gcloud config get-value project`;useremail="user:${mymail}"
+* * to enable SA token creation `gcloud projects add-iam-policy-binding ${prj} --member=${useremail} --role="roles/iam.serviceAccountTokenCreator"`
+* * note that this can apparently take up to ten minutes to actually apply, which is incredibly frustrating when you're debugging something.
+* * also note that apparently 'roles/owner' does NOT include this, for whatever reason.
+
+## DB modules
+During workspace setup the gsheets and sheetdb module repos are cloned into /workspace.The workspace's `go.work` file include replacement directives for these modules such that you will always load those from your local copy (which should be checked out at the version tag from walrusbot's `go.mod` file, HOWEVER TODO: need to automate which version tag is checked out). Therefore if there is a bug in one of these modules you can edit it locally to troubleshoot and fix it, tag and push the new version, and finally update the version in the `go.mod` files of the prancing-walrus repo.
+
 ## Run
 `F5` for interactive debugging in VSCode with the 'Launch Package' profile
 `make run` to compile and execute local code
@@ -47,48 +67,40 @@ PROD BOT_TOKEN and sheets APIKey stored in GCP Secrets Manager
 # Hosting
 GCP GCE. cloud run was too expensive.
 
+TODO: consider Terraform :(
+
 * create project
 * enable APIs
 * * GCE
 * * Cloud logging
 * * Artifact Registry
+* * Identity and Access Management (IAM) API
 * create Artifact Registy docker registry colocated with GCE instance (usc1) with a cleanup policy keep latest 5 images. immutable tags seems to prevent deletion, so don't enable it to avoid ballooning storage & cost
+* create service account `walrus-sheet-access`
+* * --command to create SA--
+* * add permissions
+* * * prj=`gcloud config get-value project`;saId="serviceAccount:walrus-sheet-access@prancingwalrus.iam.gserviceaccount.com"
+* * * for logging `gcloud projects add-iam-policy-binding ${prj} --member=${saId} --role=roles/logging.logWriter`
+* * * for artifact registry `gcloud projects add-iam-policy-binding ${prj} --member=${saId} --role=roles/artifactregistry.reader`
+* * * for secrets manager read access `gcloud projects add-iam-policy-binding ${prj} --member=${saId} --role="roles/secretmanager.secretAccessor"`
+* * * te generate SA key for sheets access `gcloud projects add-iam-policy-binding ${prj} --member=${saId} --role="roles/iam.serviceAccountKeyAdmin"`
 
-
-deploy container 
+* * * add SA email to gsheet permissions as editor
+* setup secretmanager
+* * add bot token
+* * add API key (this is for sheets, probably don't need it anymore?!?)
+* * create key for SA from IAM Service Accounts > ...s > Manage keys > Add Key > Create New Key > JSON, create
+* * upload key file to secret manager, delete local file.
+* create VM
+* * select deploy container 
+```
 us-central1-docker.pkg.dev/prancingwalrus/prancing-walrus/prancing-walrus:v0.01
 container env
 BOT_TOKEN
 <insert BOT_TOKEN here>
 APIKey
 <insert APIKey here>
-
-
-* create VM
-* * sudo apt install git
-* * curl --output /tmp/go1.21.3.linux-amd64.tar.gz https://dl.google.com/go/go1.21.3.linux-amd64.tar.gz
-* * sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf /tmp/go1.21.3.linux-amd64.tar.gz
-* * git clone https://github.com/delve/prancing-walrus.git
-* * git checkout <prodbranch>
-* set startup script TODO: secrets management yo?
 ```
-export BOT_TOKEN=<token>
-export APIKey=<key>
-export GOCACHE='/home/delve202/.cache/go-build'
-export GOMODCACHE='/home/delve202/go/pkg/mod'
-export GOPATH='/home/delve202/go'
-cd /home/delve202/prancing-walrus/walrusbot
-git config --global --add safe.directory /home/delve202/prancing-walrus
-echo "Git Pull" > /tmp/log.txt
-echo "---------" >> /tmp/log.txt
-git pull &>> /tmp/log.txt
-echo "---------" >> /tmp/log.txt
-echo "Go Env" >> /tmp/log.txt
-echo "---------" >> /tmp/log.txt
-/usr/local/go/bin/go env &>> /tmp/log.txt
-echo "---------" >> /tmp/log.txt
-echo "Go Run" >> /tmp/log.txt
-echo "---------" >> /tmp/log.txt
-/usr/local/go/bin/go run . &>> /tmp/log.txt
-```
-* reboot or manually exec startup script
+* * * TODO: secrets management yo?
+* * service account: walrus-sheet-access
+* * set custom metadata google-logging-enabled	true

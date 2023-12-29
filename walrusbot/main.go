@@ -3,10 +3,12 @@ package main
 import (
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 	"time"
 	"walrusbot/bot/assignment"
 	botcommands "walrusbot/bot/commands"
+	"walrusbot/sheetDAO"
 	"walrusbot/utility/check"
 	"walrusbot/utility/config"
 	"walrusbot/utility/log"
@@ -19,12 +21,47 @@ var (
 	BotId string
 )
 
+func tidy() {
+	log.FastLogger.Sync() // flushes buffer, if any
+	config.Cleanup()      // cleans up SA key
+}
+
 func main() {
+	log.Infow("config loaded", "config", config.Values)
+	log.Infow("testing sheetdb for sheet DAO")
+	err := sheetDAO.Initialize(config.Values.SheetId, config.Values.Secrets.GetServiceAccountKey())
+	check.Err(err)
+
+	users, err := sheetDAO.GetSnails()
+	check.Err(err)
+	log.Infow("Found", "users", users)
+
+	// log.Infow("testing sheet edit from brainstorm")
+	// ctx := context.Background()
+	// srv, err := sheets.NewService(ctx, option.WithCredentialsJSON(config.Values.Secrets.GetServiceAccountKey()), option.WithScopes(sheets.SpreadsheetsScope))
+	// check.Err(err, "Unable to retrieve Sheets client")
+	// spreadsheetId := config.Values.SheetId
+	// dataRange := fmt.Sprintf("'%s'!%s", "users", "A1:B1")
+	// data, err := srv.Spreadsheets.Values.Get(spreadsheetId, dataRange).Do()
+	// check.Err(err, "Unable to retrieve data from sheet")
+	// if len(data.Values) != 1 {
+	// 	log.Fatalw("inconcievable! header rows != 1", "rowsFound", len(data.Values), "data", data.Values)
+	// }
+	// log.Infow("retrieved sheet data", "data", data)
+	//
+	//
+	//
+	defer os.Exit(0)
+	defer tidy()
+	runtime.Goexit()
+	//
+	//
+	//
 	log.Infow("Inited, main starting up...")
-	defer log.FastLogger.Sync() // flushes buffer, if any
+	defer tidy()
 
 	// check the bot is minimally functional before loading any data
-	bot, err := disgolf.New(config.Values.Token)
+	bot, err := disgolf.New(config.Values.Secrets.GetBotToken())
 	check.Err(err, "failed to init disgolf")
 
 	// initial cache of assignment data

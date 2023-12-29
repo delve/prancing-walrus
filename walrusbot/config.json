@@ -1,7 +1,6 @@
 {
-    "Token": "", 
-    "APIKey": "",
     "BotPrefix": ["w.", "walrus."],
+    "GcpProject": "prancingwalrus",
     "AppId": "1169332084813348865",
     "ServerId": "",
     "WarPlanningChannels": [

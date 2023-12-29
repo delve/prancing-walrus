@@ -5,11 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch Package",
+            "name": "Launch Walrus",
             "type": "go",
             "request": "launch",
             "mode": "auto",
             "program": "walrusbot/"
+        },
+        {
+            "name": "Launch ImportDb",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "importWalrusDb/"
         }
     ]
 }

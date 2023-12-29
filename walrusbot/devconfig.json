@@ -1,7 +1,6 @@
 {
-    "Token": "", 
-    "APIKey": "",
     "BotPrefix": ["w.", "walrus."],
+    "GcpProject": "prancingwalrus",
     "AppId": "1170099827611291761",
     "ServerId": "775636532161019955",
     "WarPlanningChannels": [
@@ -10,7 +9,8 @@
         "👥・species-war",
         "🏯・species-war"
     ],
-    "SheetId": "1IwlPZuguMh6e7gMDS3PlTjsjBEDa8lBJrnImKPm8UA4",
+    "OldSheetId": "1IwlPZuguMh6e7gMDS3PlTjsjBEDa8lBJrnImKPm8UA4",
+    "SheetId": "18pqTrKEncHH2RJ9-R3wUKnN4gEjKaXzE0KvxUaxkiXo",
     "Roles": {
         "CaretakerRole": "foo",
         "CanRefresh": "foo"
