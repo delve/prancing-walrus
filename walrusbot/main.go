@@ -28,32 +28,26 @@ func tidy() {
 
 func main() {
 	log.Infow("config loaded", "config", config.Values)
-	log.Infow("testing sheetdb for sheet DAO")
+	log.Infow("loading sheet DAO")
 	err := sheetDAO.Initialize(config.Values.SheetId, config.Values.Secrets.GetServiceAccountKey())
 	check.Err(err)
 
-	users, err := sheetDAO.GetSnails()
-	check.Err(err)
-	log.Infow("Found", "users", users)
+	// players, err := sheetDAO.GetPlayers()
+	// check.Err(err)
+	// log.Infow("Found players", "count", len(players))
 
-	// log.Infow("testing sheet edit from brainstorm")
-	// ctx := context.Background()
-	// srv, err := sheets.NewService(ctx, option.WithCredentialsJSON(config.Values.Secrets.GetServiceAccountKey()), option.WithScopes(sheets.SpreadsheetsScope))
-	// check.Err(err, "Unable to retrieve Sheets client")
-	// spreadsheetId := config.Values.SheetId
-	// dataRange := fmt.Sprintf("'%s'!%s", "users", "A1:B1")
-	// data, err := srv.Spreadsheets.Values.Get(spreadsheetId, dataRange).Do()
-	// check.Err(err, "Unable to retrieve data from sheet")
-	// if len(data.Values) != 1 {
-	// 	log.Fatalw("inconcievable! header rows != 1", "rowsFound", len(data.Values), "data", data.Values)
-	// }
-	// log.Infow("retrieved sheet data", "data", data)
-	//
-	//
-	//
-	defer os.Exit(0)
-	defer tidy()
-	runtime.Goexit()
+	// snails, err := sheetDAO.GetSnails(2)
+	// check.Err(err)
+	// log.Infow("Found iknyc snail", "count", len(snails), "leadership", snails[0].Leadership)
+	// snails[0].Leadership = snails[0].Leadership + 1000
+	// err = snails[0].UpdateThisSnail()
+	// check.Err(err)
+	// snail, err := sheetDAO.GetSnail(2, 1)
+	// check.Err(err)
+	// log.Infow("new iknyc snail", "leadership", snail.Leadership)
+	// defer os.Exit(0)
+	// defer tidy()
+	// runtime.Goexit()
 	//
 	//
 	//

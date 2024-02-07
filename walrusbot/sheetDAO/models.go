@@ -3,6 +3,7 @@ package sheetDAO
 import (
 	"context"
 	"time"
+	"walrusbot/utility/log"
 
 	"github.com/cenkalti/backoff/v4"
 	"github.com/delve/sheetdb"
@@ -25,7 +26,10 @@ func Initialize(spreadsheetID string, saKey []byte) error {
 	loadData := func() error {
 		return dbClient.LoadData(ctx)
 	}
-	err = backoff.Retry(loadData, backoff.WithMaxRetries(backoff.NewConstantBackOff(10*time.Second), 13))
+	logRetry := func(err error, delay time.Duration) {
+		log.Infow("snailDB loaddata failed, will retry", "error", err, "retryDelay", delay)
+	}
+	err = backoff.RetryNotify(loadData, backoff.WithMaxRetries(backoff.NewConstantBackOff(10*time.Second), 13), logRetry)
 	if err != nil {
 		// retrying failed, time to die
 		return err
@@ -34,37 +38,37 @@ func Initialize(spreadsheetID string, saKey []byte) error {
 	return err
 }
 
-//go:generate sheetdb-modeler -type=Snail -children=SnailStat -test=off
+//go:generate sheetdb-modeler -type=Player -children=Snail -test=off
 
 // Snail is a struct of basic snail data
-type Snail struct {
-	SnailID   int        `json:"SnailID" db:"primarykey"`
-	DiscoId   string     `json:"discoId" db:"unique"`
-	GameName  string     `json:"gameName"`
-	Club      string     `json:"club"`
-	Server    ServerName `json:"server"`
-	ServerNum int        `json:"serverNum"`
+type Player struct {
+	PlayerID int    `json:"playerID" db:"primarykey"`
+	DiscoId  string `json:"discoId" db:"unique"`
 }
 
-//go:generate sheetdb-modeler -type=SnailStat -parent=Snail -test=off
+//go:generate sheetdb-modeler -type=Snail -parent=Player -test=off
 
 // SnailStat is a struct of snail statistics and is a child of Snail
-type SnailStat struct {
-	SnailID     int `json:"SnailID" db:"primarykey"`
-	SnailStatID int `json:"SnailStatID" db:"primarykey"`
+type Snail struct {
+	PlayerID int `json:"playerID" db:"primarykey"`
+	SnailID  int `json:"SnailID" db:"primarykey"`
 	// unix epoch of last record update
-	Updated    int `json:"updated"`
-	Leadership int `json:"leadership"`
-	Art        int `json:"art"`
-	Fth        int `json:"fth"`
-	Fame       int `json:"fame"`
-	Civ        int `json:"civ"`
-	Tech       int `json:"tech"`
-	Hp         int `json:"hp"`
-	Atk        int `json:"atk"`
-	Rush       int `json:"rush"`
-	Def        int `json:"def"`
-	// accept string (eg 13.0M), convert to number
+	Updated    int        `json:"updated"`
+	SnailName  string     `json:"snailName"`
+	Club       string     `json:"club"`
+	Server     ServerName `json:"server"`
+	ServerNum  int        `json:"serverNum"`
+	Leadership int        `json:"leadership"`
+	Art        int        `json:"art"`
+	Fth        int        `json:"fth"`
+	Fame       int        `json:"fame"`
+	Civ        int        `json:"civ"`
+	Tech       int        `json:"tech"`
+	Hp         int        `json:"hp"`
+	Atk        int        `json:"atk"`
+	Rush       int        `json:"rush"`
+	Def        int        `json:"def"`
+	// accept string (eg 13.0M), convert to number in frontend
 	TotalPower int `json:"totalPower"`
 	// 0 means not unlocked
 	ZombieForm int `json:"zombieForm"`
@@ -79,4 +83,63 @@ type SnailStat struct {
 	// 0 means not unlocked
 	DragonForm         int `json:"dragonForm"`
 	SpeciesWarEssences int `json:"speciesWarEssences"`
+}
+
+func (s *Snail) AddThisSnail() error {
+	_, err := AddSnail(s.PlayerID,
+		int(time.Now().Unix()),
+		s.SnailName,
+		s.Club,
+		ServerName(s.Server),
+		s.ServerNum,
+		s.Leadership,
+		s.Art,
+		s.Fth,
+		s.Fame,
+		s.Civ,
+		s.Tech,
+		s.Hp,
+		s.Atk,
+		s.Rush,
+		s.Def,
+		s.TotalPower,
+		s.ZombieForm,
+		s.DemonForm,
+		s.AngelForm,
+		s.MutantForm,
+		s.MechaForm,
+		s.DragonForm,
+		s.SpeciesWarEssences,
+	)
+	return err
+}
+
+func (s *Snail) UpdateThisSnail() error {
+	_, err := UpdateSnail(s.PlayerID,
+		s.SnailID,
+		int(time.Now().Unix()),
+		s.SnailName,
+		s.Club,
+		ServerName(s.Server),
+		s.ServerNum,
+		s.Leadership,
+		s.Art,
+		s.Fth,
+		s.Fame,
+		s.Civ,
+		s.Tech,
+		s.Hp,
+		s.Atk,
+		s.Rush,
+		s.Def,
+		s.TotalPower,
+		s.ZombieForm,
+		s.DemonForm,
+		s.AngelForm,
+		s.MutantForm,
+		s.MechaForm,
+		s.DragonForm,
+		s.SpeciesWarEssences,
+	)
+	return err
 }

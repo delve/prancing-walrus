@@ -7,3 +7,4 @@ import "walrusbot/bot/assignment"
 var MyAssignment = assignment.MyAssignment
 var MyAss = assignment.MyAss
 var RefreshAssignment = assignment.RefreshAssignment
+var SnailStats = 

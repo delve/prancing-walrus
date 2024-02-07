@@ -12,9 +12,9 @@ image:
     file: .gitpod.Dockerfile
 
 additionalRepositories:
-  - url: https://github.com/delve/sheetdb.git
+  - url: https://github.com/delve/sheetdb
     checkoutLocation: sheetdb
-  - url: https://github.com/delve/gsheets.git
+  - url: https://github.com/delve/gsheets
     checkoutLocation: gsheets
 
 workspaceLocation: prancing-walrus/main.code-workspace

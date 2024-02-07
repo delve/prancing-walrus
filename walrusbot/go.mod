@@ -6,8 +6,9 @@ require (
 	cloud.google.com/go/secretmanager v1.11.4
 	github.com/FedorLap2006/disgolf v0.0.0-20221004200601-99cfc3d9a0e1
 	github.com/bwmarrin/discordgo v0.27.1
+	github.com/cenkalti/backoff/v4 v4.2.1
 	github.com/delve/gsheets v0.3.0
-	github.com/delve/sheetdb v0.1.0
+	github.com/delve/sheetdb v0.1.1
 	go.uber.org/zap v1.26.0
 	golang.org/x/exp v0.0.0-20231110203233-9a3e6036ecaa
 	golang.org/x/oauth2 v0.16.0
@@ -18,7 +19,6 @@ require (
 	cloud.google.com/go/compute v1.23.3 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cloud.google.com/go/iam v1.1.5 // indirect
-	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/go-logr/logr v1.3.0 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect

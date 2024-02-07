@@ -12,6 +12,15 @@ feels like using BigQuery is just too much more cumbersome. have to be able to s
 
 would prefer a single data store (making bigquery sync even more important, and problematic)
 
+# considering GCP Datastore
+free tier might be large enough
+
+still a problem with import/export for managers review, more so than a sheets based DB which they can just query.
+
+HOWEVER, if extended to additional clubs there's less concern over access
+
+could look into dumping CSV files for import?
+
 # open questions
 NONE! :D
 

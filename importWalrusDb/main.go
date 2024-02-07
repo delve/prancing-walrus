@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"strconv"
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
@@ -42,9 +43,9 @@ func main() {
 	err := sheetDAO.Initialize(destinationSheet, config.Values.Secrets.GetServiceAccountKey())
 	check.Err(err)
 
-	users, err := sheetDAO.GetSnails()
+	players, err := sheetDAO.GetPlayers()
 	check.Err(err)
-	log.Infow("Found", "users", users)
+	log.Infow("Found DB players", "count", len(players))
 
 	// now get a data connection to manual roster
 	ctx := context.Background()
@@ -72,26 +73,51 @@ func main() {
 		if len(playerData.Values) == 0 {
 			log.Fatalw("inconcievable! no player data", "playerRowsFound", len(playerData.Values), "data", playerData.Values)
 		}
+		log.Infow("Found SS players", "count", len(playerData.Values))
 
 		for _, playerRecord := range playerData.Values {
 			if len(playerRecord[0].(string)) == 0 {
 				log.Infow("player has no disco", "playerData", playerData.Values[0])
-			} else {
-
-				insertSnail := func() error {
-					_, err := sheetDAO.AddSnail(
-						playerRecord[0].(string), //DiscoId
-						playerRecord[1].(string), // GameName
-						tab.club,                 // Club
-						sheetDAO.DeepFried,       // Server
-						18,                       // ServerNum
-					)
-					
-					return err
-				}
-				err = backoff.RetryNotify(insertSnail, backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 13), logRetry)
-				check.Err(err)
+				continue
 			}
+
+			discoId := playerRecord[0].(string)
+			insertPlayer := func() error {
+				p, err := sheetDAO.AddPlayer(
+					discoId,
+				)
+				log.Infow("reread player", "playerRecord", p)
+
+				return err
+			}
+			err = backoff.RetryNotify(insertPlayer, backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 13), logRetry)
+			check.Err(err)
+
+			p, _ := sheetDAO.GetPlayerByDiscoId(playerRecord[0].(string))
+			log.Infow("reread player", "playerRecord", p)
+
+			snailName := playerRecord[1].(string)
+			leadership, err := strconv.Atoi(playerRecord[2].(string))
+			if err != nil {
+				leadership = 0
+			}
+			insertSnail := func() error {
+				s, err := sheetDAO.AddSnail(
+					p.PlayerID,
+					int(time.Now().Unix()),
+					snailName,
+					tab.club,
+					sheetDAO.DeepFried,
+					18,
+					leadership,
+					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // values not recorded
+				)
+				log.Infow("inserted snail", "snailRecord", s)
+
+				return err
+			}
+			err = backoff.RetryNotify(insertSnail, backoff.WithMaxRetries(backoff.NewExponentialBackOff(), 13), logRetry)
+			check.Err(err)
 		}
 	}
 

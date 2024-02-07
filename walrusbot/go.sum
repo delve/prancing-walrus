@@ -1223,8 +1223,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/delve/gsheets v0.3.0 h1:WbKTYRa5gUmeWMN9ttrwOwNYDk8aN9enC4NijQaWJGE=
 github.com/delve/gsheets v0.3.0/go.mod h1:PSABOdo3GzOhtnI1w4GDfzyqWVF8jfxxvf8nJ+h98WA=
-github.com/delve/sheetdb v0.1.0 h1:zkrOJTHRsp4bv4DUlM+1wHhlzk/H27eV7VI7FcxiE6U=
-github.com/delve/sheetdb v0.1.0/go.mod h1:wSXsmklEuq/t40qpXkDCP4Zkp0CcGcZNBcCn5eNweFM=
+github.com/delve/sheetdb v0.1.1 h1:c7RpAyU37q9UrZUF95W/Mz1OSdtjqay+C/riOkUdLjY=
+github.com/delve/sheetdb v0.1.1/go.mod h1:wSXsmklEuq/t40qpXkDCP4Zkp0CcGcZNBcCn5eNweFM=
 github.com/docopt/docopt-go v0.0.0-20180111231733-ee0de3bc6815/go.mod h1:WwZ+bS3ebgob9U8Nd0kOddGdZWjyMGR8Wziv+TBNwSE=
 github.com/dustin/go-humanize v1.0.0/go.mod h1:HtrtbFcZ19U5GC7JDqmcUSB87Iq5E25KnS6fMYU6eOk=
 github.com/dustin/go-humanize v1.0.1/go.mod h1:Mu1zIs6XwVuF/gI1OepvI0qD18qycQx+mFykh5fBlto=
