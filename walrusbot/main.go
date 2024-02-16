@@ -3,7 +3,6 @@ package main
 import (
 	"os"
 	"os/signal"
-	"runtime"
 	"syscall"
 	"time"
 	"walrusbot/bot/assignment"
@@ -29,7 +28,7 @@ func tidy() {
 func main() {
 	log.Infow("config loaded", "config", config.Values)
 	log.Infow("loading sheet DAO")
-	err := sheetDAO.Initialize(config.Values.SheetId, config.Values.Secrets.GetServiceAccountKey())
+	err := sheetDAO.Initialize(config.Values.DbSheetId, config.Values.Secrets.GetServiceAccountKey())
 	check.Err(err)
 
 	// players, err := sheetDAO.GetPlayers()

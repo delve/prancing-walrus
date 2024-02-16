@@ -1,13 +1,5 @@
 https://gitpod.io/#https://github.com/delve/prancing-walrus
 # prancing-walrus
-# YOU ARE HERE
-sheetdb/sheetdb.go line 103 is ass. When we breach the ratelimit for (sheets api? gcloud something? who knows or cares) the go routine PANICS (wtf) but the failure is captured and NILED for some reason, which allows any call to update the FUCKING DATABASE to fail silently with no notice to the calling function. Oh yes, it logs. WHOOPTY FUCKING DO I'M NOT WATCHING THE LOGS AND NEITHER IS MY CODE.
-
-So in short. Some options:
-1. make the damned thing synchronous. which sounds like a generically bad idea, especially in an app that streams user interaction
-2. figure out how the generation works (looks like AST wonkery) and change it to plumb some channels in for communication with the routine(s). this sounds hard, complicated, and long.
-3. something i haven't thought of yet.
-
 ## TODO
 * fix debug launch profile so it runs main.go for whichever module the active file is part of
 ### Before 1.0
@@ -32,13 +24,29 @@ So in short. Some options:
 * several spots that assume only one guild (EG ctx.Session.State.Guilds[0]). these should be fixed
 
 # Discord perms nded
-Scope: Bot
+Scopes: Bot + applications.commands
 * Read messages/view channels
 * Send messages
 * Use External emoji
 * Use external stickers
 * Add reactions
 * Use slash comands
+* Manage Roles
+* Create public threads
+* Create private threads
+* Send messages in threads
+* Manage messages
+* Manage threads
+* Embed links
+* Read message history
+* Use external emoji
+* Use external stickers
+* Add reactions
+* Use slash commands
+
+Invite URL for test app
+https://discord.com/api/oauth2/authorize?client_id=1170099827611291761&permissions=534992219200&scope=bot+applications.commands
+
 # Dev-ing
 ## prereq
 set CONFIG, APIKey, and BOT_TOKEN env vars for this repo in gitpod user settings. CONFIG should be '../devconfig.json', BOT_TOKEN should be the bot token from Discord. Get yer own. The devconfig has a test app id and specific server id so as to not interfere with the 'production' bot.

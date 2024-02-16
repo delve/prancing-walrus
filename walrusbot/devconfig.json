@@ -9,8 +9,8 @@
         "👥・species-war",
         "🏯・species-war"
     ],
-    "OldSheetId": "1IwlPZuguMh6e7gMDS3PlTjsjBEDa8lBJrnImKPm8UA4",
-    "SheetId": "18pqTrKEncHH2RJ9-R3wUKnN4gEjKaXzE0KvxUaxkiXo",
+    "SheetId": "1IwlPZuguMh6e7gMDS3PlTjsjBEDa8lBJrnImKPm8UA4",
+    "DbSheetId": "18pqTrKEncHH2RJ9-R3wUKnN4gEjKaXzE0KvxUaxkiXo",
     "Roles": {
         "CaretakerRole": "foo",
         "CanRefresh": "foo"

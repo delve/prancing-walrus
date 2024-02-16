@@ -15,8 +15,9 @@ type ConfigStruct struct {
 	BotPrefix           []string          `json:"BotPrefix"`
 	AppId               string            `json:"AppId"`
 	WarPlanningChannels []string          `json:"WarPlanningChannels"`
-	ServerId            string            `json:"ServerId"` // Only set this if you want to limit the servers the bot talks to
-	SheetId             string            `json:"SheetId"`  // google spreadsheet data source
+	ServerId            string            `json:"ServerId"`  // Only set this if you want to limit the servers the bot talks to
+	SheetId             string            `json:"SheetId"`   // google spreadsheet data source maintained by humans
+	DbSheetId           string            `json:"DbSheetId"` // google spreadsheet data source maintained by bot
 	Roles               map[string]string `json:"Roles"`
 }
 
