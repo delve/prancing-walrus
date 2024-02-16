@@ -14,5 +14,6 @@
     "Roles": {
         "CaretakerRole": "foo",
         "CanRefresh": "foo"
-    }
+    },
+    "Debug": true
 }

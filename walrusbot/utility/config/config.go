@@ -19,6 +19,7 @@ type ConfigStruct struct {
 	SheetId             string            `json:"SheetId"`   // google spreadsheet data source maintained by humans
 	DbSheetId           string            `json:"DbSheetId"` // google spreadsheet data source maintained by bot
 	Roles               map[string]string `json:"Roles"`
+	Debug               bool              `json:"Debug"` // enables debug logging everywhere i know about
 }
 
 var Values *ConfigStruct
