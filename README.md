@@ -25,27 +25,29 @@ https://gitpod.io/#https://github.com/delve/prancing-walrus
 
 # Discord perms nded
 Scopes: Bot + applications.commands
-* Read messages/view channels
-* Send messages
-* Use External emoji
-* Use external stickers
-* Add reactions
-* Use slash comands
-* Manage Roles
-* Create public threads
-* Create private threads
-* Send messages in threads
-* Manage messages
-* Manage threads
-* Embed links
-* Read message history
-* Use external emoji
-* Use external stickers
-* Add reactions
-* Use slash commands
+* General Perms
+* * Manage Roles
+* * Read messages/view channels
+* Text Perms
+* * Send messages
+* * Create public threads
+* * Create private threads
+* * Send messages in threads
+* * Manage messages
+* * Manage threads
+* * Embed links
+* * Read message history
+* * Use External emoji
+* * Use external stickers
+* * Add reactions
+* * Use slash comands
+* * Use external emoji
+* * Use external stickers
+* * Add reactions
+* * Use slash commands
 
 Invite URL for test app
-https://discord.com/api/oauth2/authorize?client_id=1170099827611291761&permissions=534992219200&scope=bot+applications.commands
+https://discord.com/oauth2/authorize?client_id=1170099827611291761&permissions=534992219200&scope=bot+applications.commands
 
 # Dev-ing
 ## prereq

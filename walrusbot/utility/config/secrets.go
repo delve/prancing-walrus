@@ -99,15 +99,19 @@ func get_secrets() (err error) {
 	secretValue = string(secretBytes)
 	Values.Secrets.sheetsOauthCert = secretValue
 
-	// oauthConf, err := google.ConfigFromJSON([]byte(Values.Secrets.sheetsOauthCert), "https://www.googleapis.com/auth/spreadsheets")
-	// check.Err(err)
-	// Values.Secrets.sheetsOauthToken = getTokenFromWeb(oauthConf)
+	// tidy up any loose SA keys
+	keyList, err := listSAKeys()
+	check.Err(err)
+	for _, key := range keyList {
+		deleteSAKey(key)
+	}
 
-	Values.Secrets.serviceAccountKey, err = createKey("walrus-sheet-access@prancingwalrus.iam.gserviceaccount.com")
+	Values.Secrets.serviceAccountKey, err = createSAKey()
 	check.Err(err)
 	return err
 }
 
+// accessSecretVersion retrieves the latest version for the named secret from GCP secretmanager
 func accessSecretVersion(secretName string) ([]byte, error) {
 
 	version := fmt.Sprintf("projects/%s/secrets/%s/versions/latest", Values.GcpProject, secretName)
@@ -130,15 +134,32 @@ func accessSecretVersion(secretName string) ([]byte, error) {
 	return result.Payload.Data, nil
 }
 
-// createKey creates a service account key.
-func createKey(serviceAccountEmail string) (*iam.ServiceAccountKey, error) {
-	ctx := context.Background()
-	service, err := iam.NewService(ctx)
+// listSAKeys returns a slice of SA Key IDs suitable for deleting
+func listSAKeys() ([]string, error) {
+	service, err := getIamSvc()
+	check.Err(err, "could not create IAM service in listSAKeys()")
+	keyNames := []string{}
+	resource := "projects/" + Values.GcpProject + "/serviceAccounts/" + Values.GcpSAName
+
+	keyList, err := service.Projects.ServiceAccounts.Keys.List(resource).Do()
 	if err != nil {
-		return nil, fmt.Errorf("iam.NewService: %w", err)
+		return nil, fmt.Errorf("Projects.ServiceAccounts.Keys.List: %w", err)
 	}
 
-	resource := "projects/" + Values.GcpProject + "/serviceAccounts/" + serviceAccountEmail
+	for _, key := range keyList.Keys {
+		if key.KeyType == "USER_MANAGED" {
+			keyNames = append(keyNames, key.Name)
+		}
+	}
+	return keyNames, nil
+}
+
+// createSAKey creates a service account key.
+func createSAKey() (*iam.ServiceAccountKey, error) {
+	service, err := getIamSvc()
+	check.Err(err, "could not create IAM service in createSAKey()")
+
+	resource := "projects/" + Values.GcpProject + "/serviceAccounts/" + Values.GcpSAName
 	request := &iam.CreateServiceAccountKeyRequest{}
 	key, err := service.Projects.ServiceAccounts.Keys.Create(resource, request).Do()
 	if err != nil {
@@ -149,17 +170,27 @@ func createKey(serviceAccountEmail string) (*iam.ServiceAccountKey, error) {
 	return key, nil
 }
 
-// deleteKey deletes a service account key.
-func deleteKey(fullKeyName string) error {
-	ctx := context.Background()
-	service, err := iam.NewService(ctx)
-	check.Err(err, "could not create IAM service in deleteKey()")
+// deleteSAKey deletes a service account key.
+func deleteSAKey(fullKeyName string) error {
+	service, err := getIamSvc()
+	check.Err(err, "could not create IAM service in deleteSAKey()")
 
 	_, err = service.Projects.ServiceAccounts.Keys.Delete(fullKeyName).Do()
 	check.Err(err, "Projects.ServiceAccounts.Keys.Delete failed")
 
 	log.Infow("deleted SA key", "name", fullKeyName)
 	return nil
+}
+
+// getIamSvc returns a GCP IAM service client
+func getIamSvc() (*iam.Service, error) {
+	ctx := context.Background()
+	service, err := iam.NewService(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("iam.NewService: %w", err)
+	}
+
+	return service, nil
 }
 
 // OAUTH2 mess

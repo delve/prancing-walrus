@@ -14,5 +14,6 @@
         "CaretakerRole": "Walrus Wranglers",
         "CanRefresh": "Manager"
     },
-    "Debug": false
+    "Debug": false,
+    "GcpSAName": "walrus-sheet-access@prancingwalrus.iam.gserviceaccount.com"
 }

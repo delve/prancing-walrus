@@ -5,7 +5,6 @@
     "ServerId": "775636532161019955",
     "WarPlanningChannels": [
         "🧬・prancingwalrustests",
-        "🧬・species-war",
         "👥・species-war",
         "🏯・species-war"
     ],
@@ -15,5 +14,6 @@
         "CaretakerRole": "foo",
         "CanRefresh": "foo"
     },
-    "Debug": true
+    "Debug": true,
+    "GcpSAName": "walrus-sheet-access@prancingwalrus.iam.gserviceaccount.com"
 }

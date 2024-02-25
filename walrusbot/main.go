@@ -34,25 +34,6 @@ func main() {
 	err := sheetDAO.Initialize(config.Values.DbSheetId, config.Values.Secrets.GetServiceAccountKey())
 	check.Err(err)
 
-	// players, err := sheetDAO.GetPlayers()
-	// check.Err(err)
-	// log.Infow("Found players", "count", len(players))
-
-	// snails, err := sheetDAO.GetSnails(2)
-	// check.Err(err)
-	// log.Infow("Found iknyc snail", "count", len(snails), "leadership", snails[0].Leadership)
-	// snails[0].Leadership = snails[0].Leadership + 1000
-	// err = snails[0].UpdateThisSnail()
-	// check.Err(err)
-	// snail, err := sheetDAO.GetSnail(2, 1)
-	// check.Err(err)
-	// log.Infow("new iknyc snail", "leadership", snail.Leadership)
-	// defer os.Exit(0)
-	// defer tidy()
-	// runtime.Goexit()
-	//
-	//
-	//
 	log.Infow("Inited, main starting up...")
 	defer tidy()
 
@@ -60,7 +41,7 @@ func main() {
 	bot, err := disgolf.New(config.Values.Secrets.GetBotToken())
 	check.Err(err, "failed to init disgolf")
 
-	bot.Session.Debug = true
+	bot.Session.Debug = config.Values.Debug
 
 	// initial cache of assignment data
 	assignment.CacheAssignments()
@@ -70,7 +51,7 @@ func main() {
 	bot.Router.Register(botcommands.RefreshAssignment)
 
 	bot.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
-		log.Infow("Bot is up!")
+		log.Infow("Bot session opened")
 	})
 	bot.AddHandler(bot.Router.HandleInteraction)
 	// lets just not respond to DMs at all for now.

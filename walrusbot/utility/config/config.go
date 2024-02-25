@@ -19,7 +19,8 @@ type ConfigStruct struct {
 	SheetId             string            `json:"SheetId"`   // google spreadsheet data source maintained by humans
 	DbSheetId           string            `json:"DbSheetId"` // google spreadsheet data source maintained by bot
 	Roles               map[string]string `json:"Roles"`
-	Debug               bool              `json:"Debug"` // enables debug logging everywhere i know about
+	Debug               bool              `json:"Debug"`     // enables debug logging everywhere i know about
+	GcpSAName           string            `json:"GcpSAName"` // IAM service account name (in email form since that's the only useful form) which the bot runs under
 }
 
 var Values *ConfigStruct
@@ -54,5 +55,5 @@ func readConfig() (err error) {
 
 func Cleanup() {
 	// tidy up by deleting the SA key we created.
-	deleteKey(Values.Secrets.serviceAccountKey.Name)
+	deleteSAKey(Values.Secrets.serviceAccountKey.Name)
 }
