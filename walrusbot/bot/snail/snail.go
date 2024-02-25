@@ -1,15 +1,23 @@
 package snail
 
 import (
+	"fmt"
+	"regexp"
+	"strings"
+	"time"
+	"walrusbot/sheetDAO"
 	"walrusbot/utility/helpers"
 
 	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
+	"github.com/delve/sheetdb"
 )
 
-// var autocomplete *discordgo.ApplicationCommandOption = &discordgo.ApplicationCommandOption{Autocomplete: true}
+type alreadyResponded string
 
-// var subCommandList []string = []string{"add", "list", "delete", "show", "update", "help"}
+func (e alreadyResponded) Error() string {
+	return "already responded"
+}
 
 var integerOptionZeroValue = 0.0
 
@@ -30,32 +38,90 @@ var Snail = &disgolf.Command{
 		{
 			Name:        "add",
 			Description: "Add a new snail.",
+			Options: []*discordgo.ApplicationCommandOption{{
+				Type:        discordgo.ApplicationCommandOptionString,
+				Name:        "name",
+				Description: "Name of the snail you want to add",
+				Required:    true,
+			}},
 			Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
+				if match, err := regexp.MatchString("^[0-9a-zA-Z_-]$", ctx.Options["name"].Value.(string)); !match || err != nil {
+					_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("%s doesn't look like a valid name. Just what stunt are you trying to pull here?", ctx.Options["name"].Value), true, ctx))
+					return
+				}
+				player, err := sheetDAO.GetPlayerByDiscoId(ctx.Interaction.Member.User.Username)
+				if _, isErr := err.(*sheetdb.NotFoundError); isErr {
+					// create a new player
+					player, err = sheetDAO.AddPlayer(ctx.Interaction.Member.User.Username)
+					if err != nil {
+						_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, there was a problem adding you to the player table. Paging <pingCaretakerRole> for assistance.", true, ctx))
+						return
+					}
+				}
+				snails, err := player.GetSnails()
+				if err != nil {
+					_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, there was a problem looking up your snail data. Paging <pingCaretakerRole> for assistance.", true, ctx))
+					return
+				}
+				for _, snail := range snails {
+					if snail.SnailName == ctx.Options["name"].Value {
+						_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("Sorry, you already told me about that snail. Try `/snail show %s` to check up on them.\nIf this is a new snail in a different server then you can give me a nickname for it.", ctx.Options["name"].Value), true, ctx))
+						return
+					}
+				}
+
+				snail, err := player.AddSnail(int(time.Now().Unix()), ctx.Options["name"].Value.(string), "", "", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 				_ = ctx.Respond(helpers.GetDefaultResponse("add subcommand.", true, ctx))
 			}),
 		},
-		{
+		{ // list command
 			Name:        "list",
 			Description: "Get a list of all your snails.",
 			Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-				_ = ctx.Respond(helpers.GetDefaultResponse("list subcommand.", true, ctx))
+				snails, err := getSnails(ctx)
+				if _, isErr := err.(alreadyResponded); isErr { // response has already been sent
+					return
+				}
+
+				var sb strings.Builder
+				sb.WriteString(fmt.Sprintf("Hi %s! These are the snails I know about.\n", ctx.Interaction.Member.User.Username))
+				for _, snail := range snails {
+					sb.WriteString(fmt.Sprintf("%s on %s %d\n", snail.SnailName, snail.Server, snail.ServerNum))
+				}
+				_ = ctx.Respond(helpers.GetDefaultResponse(sb.String(), true, ctx))
 			}),
 		},
+		/* Delete requires a confirmation step, making it a more complex interaction, worry about it later
 		{
 			Name:        "delete",
 			Description: "Delete one of your snails. CAUTION: Cannot be undone.",
 			Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-				_ = ctx.Respond(helpers.GetDefaultResponse("delete subcommand.", true, ctx))
+				_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, delete isn't implemented yet. Ask Mehh for assistance.", true, ctx))
 			}),
-		},
-		{
+		},*/
+		{ // show command
 			Name:        "show",
 			Description: "Show the stats of one of your snails",
+			Options: []*discordgo.ApplicationCommandOption{{
+				Type:        discordgo.ApplicationCommandOptionString,
+				Name:        "name",
+				Description: "Name of the snail you want to see",
+				Required:    true,
+			}},
 			Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-				_ = ctx.Respond(helpers.GetDefaultResponse("show subcommand.", true, ctx))
+				snails, err := getSnails(ctx)
+				if _, isErr := err.(alreadyResponded); isErr { // response has already been sent
+					return
+				}
+				for _, snail := range snails {
+					if snail.SnailName == ctx.Options["name"].Value {
+						_ = ctx.Respond(helpers.GetDefaultResponse(formatSnailStats(snail), true, ctx))
+						return
+					}
+				}
+				_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("Sorry, looks like you haven't told me about %s. Maybe you could `/snail add` them.", ctx.Options["name"].Value), true, ctx))
 			}),
 		},
-
 		/* help subcommand is unimplemented
 		{
 			Name:        "help",
@@ -72,172 +138,42 @@ var Snail = &disgolf.Command{
 				_ = ctx.Respond(helpers.GetDefaultResponse("show subcommand.", true, ctx))
 			}),
 		},
-
-		{
-			Name:        "olddate",
-			Description: "Update your snails' stats.",
-			SubCommands: disgolf.NewRouter([]*disgolf.Command{
-				{
-					Name:        "leadership",
-					Description: "Update your snail's leadership",
-					Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-						_ = ctx.Respond(helpers.GetDefaultResponse("update leadership subcommand.", true, ctx))
-					}),
-				},
-				{
-					Name:        "speciesessences",
-					Description: "Update how many species war essences your snail has",
-					Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-						_ = ctx.Respond(helpers.GetDefaultResponse("update s_war_essences subcommand.", true, ctx))
-					}),
-				},
-				{
-					Name:        "totalpower",
-					Description: "Update your snail's total power",
-					Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-						// accept string (eg 13.0M), convert to number in frontend
-						_ = ctx.Respond(helpers.GetDefaultResponse("update totalpower subcommand.", true, ctx))
-					}),
-				},
-				{
-					Name:        "art",
-					Description: "Update your snail's Art",
-					Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-						_ = ctx.Respond(helpers.GetDefaultResponse("update Art subcommand.", true, ctx))
-					}),
-				},
-				{
-					Name:        "fth",
-					Description: "Update your snail's Fth",
-					Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-						_ = ctx.Respond(helpers.GetDefaultResponse("update Fth subcommand.", true, ctx))
-					}),
-				},
-				{
-					Name:        "fame",
-					Description: "Update your snail's Fame",
-					Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-						_ = ctx.Respond(helpers.GetDefaultResponse("update Fame subcommand.", true, ctx))
-					}),
-				},
-				{
-					Name:        "civ",
-					Description: "Update your snail's Civ",
-					Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-						_ = ctx.Respond(helpers.GetDefaultResponse("update Civ subcommand.", true, ctx))
-					}),
-				},
-				{
-					Name:        "tech",
-					Description: "Update your snail's Tech",
-					Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-						_ = ctx.Respond(helpers.GetDefaultResponse("update Tech subcommand.", true, ctx))
-					}),
-				},
-				{
-					Name:        "hp",
-					Description: "Update your snail's Hp",
-					Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-						_ = ctx.Respond(helpers.GetDefaultResponse("update Hp subcommand.", true, ctx))
-					}),
-				},
-				{
-					Name:        "atk",
-					Description: "Update your snail's Atk",
-					Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-						_ = ctx.Respond(helpers.GetDefaultResponse("update Atk subcommand.", true, ctx))
-					}),
-				},
-				{
-					Name:        "rush",
-					Description: "Update your snail's Rush",
-					Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-						_ = ctx.Respond(helpers.GetDefaultResponse("update Rush subcommand.", true, ctx))
-					}),
-				},
-				{
-					Name:        "def",
-					Description: "Update your snail's Def",
-					Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-						_ = ctx.Respond(helpers.GetDefaultResponse("update Def subcommand.", true, ctx))
-					}),
-				},
-
-				/* Club update disabled until i work out a way to deal with it
-				{
-					Name:        "Club",
-					Description: "Update your snail's Club membership",
-					Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-						_ = ctx.Respond(helpers.GetDefaultResponse("update Club subcommand.", true, ctx))
-					}),
-				},*/
-
-				{
-					Name:        "zombie",
-					Description: "Update your snail's Zombie form; 0 means it isn't unlocked yet",
-					Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-						_ = ctx.Respond(helpers.GetDefaultResponse("update Zombie subcommand.", true, ctx))
-					}),
-				},
-				{
-					Name:        "demon",
-					Description: "Update your snail's Demon form; 0 means it isn't unlocked yet",
-					Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-						_ = ctx.Respond(helpers.GetDefaultResponse("update Demon subcommand.", true, ctx))
-					}),
-				},
-				{
-					Name:        "angel",
-					Description: "Update your snail's Angel form; 0 means it isn't unlocked yet",
-					Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-						_ = ctx.Respond(helpers.GetDefaultResponse("update Angel subcommand.", true, ctx))
-					}),
-				},
-				{
-					Name:        "mutant",
-					Description: "Update your snail's Mutant form; 0 means it isn't unlocked yet",
-					Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-						_ = ctx.Respond(helpers.GetDefaultResponse("update Mutant subcommand.", true, ctx))
-					}),
-				},
-				{
-					Name:        "mecha",
-					Description: "Update your snail's Mecha form; 0 means it isn't unlocked yet",
-					Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-						_ = ctx.Respond(helpers.GetDefaultResponse("update Mecha subcommand.", true, ctx))
-					}),
-				},
-				{
-					Name:        "dragon",
-					Description: "Update your snail's Zombie form; 0 means it isn't unlocked yet",
-					Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-						_ = ctx.Respond(helpers.GetDefaultResponse("update Dragon subcommand.", true, ctx))
-					}),
-				},
-				{
-					Name:        "name",
-					Description: "Update your snail's name",
-					Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-						_ = ctx.Respond(helpers.GetDefaultResponse("update SnailName subcommand.", true, ctx))
-					}),
-				},
-				{
-					Name:        "server",
-					Description: "Move your snail to a different game server",
-					Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-						_ = ctx.Respond(helpers.GetDefaultResponse("update Server subcommand.", true, ctx))
-					}),
-				},
-				{
-					Name:        "servernum",
-					Description: "Move your snail to a different game server number",
-					Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-						_ = ctx.Respond(helpers.GetDefaultResponse("update ServerNum subcommand.", true, ctx))
-					}),
-				},
-			}),
-		},
 	}),
+}
+
+func getSnails(ctx *disgolf.Ctx) ([]*sheetDAO.Snail, error) {
+	var responded alreadyResponded = ""
+	// get list of snails from DB by disco username ctx.Interaction.Member.User.Username
+	player, err := sheetDAO.GetPlayerByDiscoId(ctx.Interaction.Member.User.Username)
+	if err != nil {
+		_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, there was a problem looking up your player data. Paging <pingCaretakerRole> for assistance.", true, ctx))
+		return nil, responded
+	}
+	snails, err := player.GetSnails()
+	if err != nil {
+		_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, there was a problem looking up your snail data. Paging <pingCaretakerRole> for assistance.", true, ctx))
+		return nil, responded
+	}
+	if len(snails) == 0 {
+		_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, I don't know any of your snails. Maybe you should `/snail add` one.", true, ctx))
+		return nil, responded
+	}
+
+	return snails, nil
+}
+
+func formatSnailStats(snail *sheetDAO.Snail) string {
+	var sb strings.Builder
+	sb.WriteString(fmt.Sprintf("This is everything I know about %s.\n", snail.SnailName))
+	sb.WriteString(fmt.Sprintf("Server: %s %d\tClub: %s\n", snail.Server, snail.ServerNum, snail.Club))
+	sb.WriteString(fmt.Sprintf("Leadership: %d\tHoarded SW Essences: %d\n", snail.Leadership, snail.SpeciesWarEssences))
+	sb.WriteString(fmt.Sprintf("Total Power: %d\n", snail.TotalPower))
+	sb.WriteString(fmt.Sprintf("__AFFCT__\nArt \t%d\tFaith\t%d\nFame\t%d\tCiv\t%d\nTech \t%d\n", snail.Art, snail.Fth, snail.Fame, snail.Civ, snail.Tech))
+	sb.WriteString(fmt.Sprintf("__HARD__\nHP \t%d\tAtk\t%d\nRush\t%d\tDef\t%d\n", snail.Hp, snail.Atk, snail.Rush, snail.Def))
+	// custom emoji in the Snailverse server
+	sb.WriteString(fmt.Sprintf("__Form Tiers__\n:zombie~1:\t%d\t:demon:\t%d\n:angel~1:\t%d\t:mutant:\t%d\n:mecha:\t%d\t:dragon~1:\t%d", snail.ZombieForm, snail.DemonForm, snail.AngelForm, snail.MutantForm, snail.MechaForm, snail.DragonForm))
+
+	return sb.String()
 }
 
 var updateOptions = []*discordgo.ApplicationCommandOption{
@@ -393,13 +329,13 @@ var updateOptions = []*discordgo.ApplicationCommandOption{
 		Type:        discordgo.ApplicationCommandOptionString,
 		Name:        "newname",
 		Description: "Change your snail's name",
-		Required: false,
+		Required:    false,
 	},
 	{
 		Type:        discordgo.ApplicationCommandOptionString,
 		Name:        "server",
 		Description: "Game server name",
-		Required: false,
+		Required:    false,
 	},
 	{
 		Type:        discordgo.ApplicationCommandOptionInteger,
@@ -409,5 +345,4 @@ var updateOptions = []*discordgo.ApplicationCommandOption{
 		// MaxValue:    10,
 		Required: false,
 	},
-
 }

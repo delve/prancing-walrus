@@ -6,6 +6,7 @@ https://gitpod.io/#https://github.com/delve/prancing-walrus
 * automate version tagging & publishing (makefile)
 * automate deployment (makefile)
 * replace as many Panics as possible with proper error handling
+* Extract user input sanitizing into the data model somehow
 * on /refreshassignments add a discord name check and warn on incorrect names.
 * Add backoff-retry logic around accessing the spreadsheet
 * Look into backoff-retry in the discord commands, to recover from discord outages
