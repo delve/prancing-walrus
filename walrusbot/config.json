@@ -14,6 +14,19 @@
         "CaretakerRole": "Walrus Wranglers",
         "CanRefresh": "Manager"
     },
-    "Debug": false,
-    "GcpSAName": "walrus-sheet-access@prancingwalrus.iam.gserviceaccount.com"
+    "Debug": {
+        "appLogs": false,
+        "discgoLogs": false
+    },
+    "GcpSAName": "walrus-sheet-access@prancingwalrus.iam.gserviceaccount.com",
+    "SMgrSecrets": {
+        "botToken": "BOT_TOKEN",
+        "SheetsAPIKey": "SheetsAPIKey",
+        "SheetsOauth": "SheetsOauth"
+    },
+    "SMgrSecretsDescriptions": {
+        "botToken": "the bot token for discord auth",
+        "SheetsAPIKey": "API key for non IAM auth to manual sheet",
+        "SheetsOauth": "TBH i don't really know! D:"
+    }
 }

@@ -59,7 +59,7 @@ func get_secrets() (err error) {
 	var secretValue, secretName string
 	var secretBytes []byte
 	secretValue = ""
-	secretName = "BOT_TOKEN"
+	secretName = Values.SMgrSecretList["botToken"]
 	log.Infow("retrieving secret from secretmanager", "secretName", secretName)
 	secretBytes, err = accessSecretVersion(secretName)
 	if err != nil {

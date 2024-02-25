@@ -27,7 +27,7 @@ func tidy() {
 
 func main() {
 	log.Infow("config loaded", "config", config.Values)
-	if config.Values.Debug {
+	if config.Values.Debug["appLogs"] {
 		log.SetLevelDebug()
 	}
 	log.Infow("loading sheet DAO")
@@ -41,14 +41,12 @@ func main() {
 	bot, err := disgolf.New(config.Values.Secrets.GetBotToken())
 	check.Err(err, "failed to init disgolf")
 
-	bot.Session.Debug = config.Values.Debug
+	bot.Session.Debug = config.Values.Debug["discgoLogs"]
 
 	// initial cache of assignment data
 	assignment.CacheAssignments()
 
-	bot.Router.Register(botcommands.MyAssignment)
-	bot.Router.Register(botcommands.MyAss)
-	bot.Router.Register(botcommands.RefreshAssignment)
+	botcommands.Load(bot)
 
 	bot.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
 		log.Infow("Bot session opened")
@@ -71,6 +69,8 @@ func main() {
 	if err != nil {
 		log.Fatalw("cannot publish commands", "err", err)
 	}
+	log.Infow("Bot is up!")
+
 	stchan := make(chan os.Signal, 1)
 	signal.Notify(stchan, syscall.SIGTERM, os.Interrupt, syscall.SIGSEGV)
 end:

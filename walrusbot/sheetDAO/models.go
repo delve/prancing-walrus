@@ -29,7 +29,7 @@ func Initialize(spreadsheetID string, saKey []byte) error {
 	logRetry := func(err error, delay time.Duration) {
 		log.Infow("snailDB loaddata failed, will retry", "error", err, "retryDelay", delay)
 	}
-	err = backoff.RetryNotify(loadData, backoff.WithMaxRetries(backoff.NewConstantBackOff(10*time.Second), 13), logRetry)
+	err = backoff.RetryNotify(loadData, backoff.WithMaxRetries(backoff.NewConstantBackOff(3*time.Second), 13), logRetry)
 	if err != nil {
 		// retrying failed, time to die
 		return err

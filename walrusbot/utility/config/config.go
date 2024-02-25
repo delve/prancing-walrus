@@ -11,6 +11,7 @@ const defaultParameterFile = "./config.json"
 
 type ConfigStruct struct {
 	Secrets             secrets
+	SMgrSecretList      map[string]string `json:"SMgrSecretList"`
 	GcpProject          string            `json:"GcpProject"`
 	BotPrefix           []string          `json:"BotPrefix"`
 	AppId               string            `json:"AppId"`
@@ -19,7 +20,7 @@ type ConfigStruct struct {
 	SheetId             string            `json:"SheetId"`   // google spreadsheet data source maintained by humans
 	DbSheetId           string            `json:"DbSheetId"` // google spreadsheet data source maintained by bot
 	Roles               map[string]string `json:"Roles"`
-	Debug               bool              `json:"Debug"`     // enables debug logging everywhere i know about
+	Debug               map[string]bool   `json:"Debug"`     // enables debug logging everywhere i know about
 	GcpSAName           string            `json:"GcpSAName"` // IAM service account name (in email form since that's the only useful form) which the bot runs under
 }
 
