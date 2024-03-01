@@ -48,7 +48,12 @@ Scopes: Bot + applications.commands
 * * Use slash commands
 
 Invite URL for test app
+
 https://discord.com/oauth2/authorize?client_id=1170099827611291761&permissions=534992219200&scope=bot+applications.commands
+
+Invite URL for prod app
+
+https://discord.com/oauth2/authorize?client_id=1169332084813348865&permissions=534992219200&scope=bot+applications.commands
 
 # Dev-ing
 ## prereq
