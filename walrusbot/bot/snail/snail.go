@@ -204,7 +204,10 @@ func formatSnailStats(snail *sheetDAO.Snail) string {
 	sb.WriteString(fmt.Sprintf("__AFFCT__\nArt \t%d\tFaith\t%d\nFame\t%d\tCiv\t%d\nTech \t%d\n", snail.Art, snail.Fth, snail.Fame, snail.Civ, snail.Tech))
 	sb.WriteString(fmt.Sprintf("__HARD__\nHP \t%d\tAtk\t%d\nRush\t%d\tDef\t%d\n", snail.Hp, snail.Atk, snail.Rush, snail.Def))
 	// custom emoji in the Snailverse server
-	sb.WriteString(fmt.Sprintf("__Form Tiers__\n:zombie~1:\t%d\t:demon:\t%d\n:angel~1:\t%d\t:mutant:\t%d\n:mecha:\t%d\t:dragon~1:\t%d", snail.ZombieForm, snail.DemonForm, snail.AngelForm, snail.MutantForm, snail.MechaForm, snail.DragonForm))
+	sb.WriteString("__Form Tiers__\n")
+	sb.WriteString(fmt.Sprintf("<:zombie:1211480757382418443>\t%d\t<:demon:1211480750457888798>\t%d\n", snail.ZombieForm, snail.DemonForm))
+	sb.WriteString(fmt.Sprintf("<:angel:1211480749195264010>\t%d\t<:mutant:1211480755935514674>\t%d\n", snail.AngelForm, snail.MutantForm))
+	sb.WriteString(fmt.Sprintf("<:mecha:1211480754228305990>\t%d\t<:dragon:1211480752311509042>\t%d", snail.MechaForm, snail.DragonForm))
 
 	return sb.String()
 }
