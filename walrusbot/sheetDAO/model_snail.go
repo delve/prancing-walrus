@@ -488,9 +488,6 @@ func _Snail_validateSnailName(snailName string) error {
 }
 
 func _Snail_validateClub(club string) error {
-	if club == "" {
-		return &sheetdb.EmptyStringError{FieldName: "Club"}
-	}
 	return nil
 }
 

@@ -9,7 +9,7 @@
         "🏯・species-war"
     ],
     "SheetId": "1kulg2agXhCRbrdYDtYf5ggq_8U2yWkib_gxUx7mV2II",
-    "DbSheetId": "GOMAKEONE",
+    "DbSheetId": "1FXsdxuMW5gqO0s6pJJ9oIxLmbV_K4qdae0-yoWfHNIo",
     "Roles": {
         "CaretakerRole": "Walrus Wranglers",
         "CanRefresh": "Manager"
@@ -19,12 +19,12 @@
         "discgoLogs": false
     },
     "GcpSAName": "walrus-sheet-access@prancingwalrus.iam.gserviceaccount.com",
-    "SMgrSecrets": {
+    "SMgrSecretList": {
         "botToken": "BOT_TOKEN",
         "SheetsAPIKey": "SheetsAPIKey",
         "SheetsOauth": "SheetsOauth"
     },
-    "SMgrSecretsDescriptions": {
+    "SMgrSecretDescriptions": {
         "botToken": "the bot token for discord auth",
         "SheetsAPIKey": "API key for non IAM auth to manual sheet",
         "SheetsOauth": "TBH i don't really know! D:"

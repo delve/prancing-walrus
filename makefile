@@ -1,4 +1,4 @@
-containerVersion = v0.03
+containerVersion = v0.04
 debugVersion = test
 
 MODELS_DIR := ./walrusbot/sheetDAO
@@ -10,7 +10,7 @@ MODEL_FILES := $(MODELS_DIR)/model_snail.go $(MODELS_DIR)/model_snailstat.go
 run: /tmp/gcloud.inited $(MODEL_FILES)
 	cd walrusbot && go run .
 
-image:	/tmp/image.built $(MODEL_FILES)
+image: $(MODEL_FILES) /tmp/image.built
 /tmp/image.built:
 	cd walrusbot && pack build prancing-walrus --builder=gcr.io/buildpacks/builder
 	touch /tmp/image.built
@@ -26,7 +26,7 @@ runImage: image
 
 publish: gcloudinit image
 	docker tag prancing-walrus us-central1-docker.pkg.dev/prancingwalrus/prancing-walrus/prancing-walrus:$(containerVersion)
-	docker push us-central1-docker.pkg.dev/prancingwalrus/prancing-walrus/prancing-walrus:v$(containerVersion)
+	docker push us-central1-docker.pkg.dev/prancingwalrus/prancing-walrus/prancing-walrus:$(containerVersion)
 
 publishDebug: gcloudinit image
 	docker tag prancing-walrus us-central1-docker.pkg.dev/prancingwalrus/prancing-walrus/prancing-walrus:$(debugVersion)
@@ -55,6 +55,7 @@ dbImportInit:
 	rm -rf ./importWalrusDb/sheetDAO && cp -r ./walrusbot/sheetDAO ./importWalrusDb
 	rm -rf ./importWalrusDb/utility && cp -r ./walrusbot/utility ./importWalrusDb
 	rm -f ./importWalrusDb/devconfig.json && cp ./walrusbot/devconfig.json ./importWalrusDb/devconfig.json
+	rm -f ./importWalrusDb/config.json && cp ./walrusbot/config.json ./importWalrusDb/config.json
 
 importDb: gcloudinit dbImportInit $(MODEL_FILES)
 	cd importWalrusDb && go run .

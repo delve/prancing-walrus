@@ -55,7 +55,7 @@ type Snail struct {
 	// unix epoch of last record update
 	Updated    int        `json:"updated"`
 	SnailName  string     `json:"snailName"`
-	Club       string     `json:"club"`
+	Club       string     `json:"club" db:"allowempty"`
 	Server     ServerName `json:"server"`
 	ServerNum  int        `json:"serverNum"`
 	Leadership int        `json:"leadership"`

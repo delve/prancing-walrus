@@ -7,6 +7,7 @@ import (
 	"time"
 	"walrusbot/sheetDAO"
 	"walrusbot/utility/helpers"
+	"walrusbot/utility/log"
 
 	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
@@ -35,7 +36,7 @@ var Snail = &disgolf.Command{
 		_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("You have to use a subcommand your snailness. %v", subCommandList), true, ctx))
 	}),*/
 	SubCommands: disgolf.NewRouter([]*disgolf.Command{
-		{
+		{ // add command
 			Name:        "add",
 			Description: "Add a new snail.",
 			Options: []*discordgo.ApplicationCommandOption{{
@@ -45,8 +46,8 @@ var Snail = &disgolf.Command{
 				Required:    true,
 			}},
 			Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-				if match, err := regexp.MatchString("^[0-9a-zA-Z_-]$", ctx.Options["name"].Value.(string)); !match || err != nil {
-					_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("%s doesn't look like a valid name. Just what stunt are you trying to pull here?", ctx.Options["name"].Value), true, ctx))
+				if match, err := regexp.MatchString("^[0-9a-zA-Z_-]+$", ctx.Options["name"].StringValue()); !match || err != nil {
+					_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("%s doesn't look like a valid name. Just what stunt are you trying to pull here?\nOnly allowing letters, numbers, _, and -. Because I couldn't find a list of characters the game consideres valid.", ctx.Options["name"].StringValue()), true, ctx))
 					return
 				}
 				player, err := sheetDAO.GetPlayerByDiscoId(ctx.Interaction.Member.User.Username)
@@ -54,24 +55,27 @@ var Snail = &disgolf.Command{
 					// create a new player
 					player, err = sheetDAO.AddPlayer(ctx.Interaction.Member.User.Username)
 					if err != nil {
-						_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, there was a problem adding you to the player table. Paging <pingCaretakerRole> for assistance.", true, ctx))
+						_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, there was a problem adding you to the player table. Paging <pingCaretakerRole> to review the log", true, ctx))
+						log.Errorw("Error retrieving player in /snail add", "err", err)
 						return
 					}
 				}
-				snails, err := player.GetSnails()
-				if err != nil {
-					_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, there was a problem looking up your snail data. Paging <pingCaretakerRole> for assistance.", true, ctx))
+				snail, err := getSnail(ctx, ctx.Options["name"].StringValue())
+				if err != nil { // logged and responded in function
 					return
 				}
-				for _, snail := range snails {
-					if snail.SnailName == ctx.Options["name"].Value {
-						_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("Sorry, you already told me about that snail. Try `/snail show %s` to check up on them.\nIf this is a new snail in a different server then you can give me a nickname for it.", ctx.Options["name"].Value), true, ctx))
-						return
-					}
+				if snail != nil {
+					_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("Sorry, you already told me about that snail. Try `/snail show %s` to check up on them.\nIf this is a new snail in a different server then you can give me a nickname for it.", ctx.Options["name"].StringValue()), true, ctx))
+					return
 				}
 
-				snail, err := player.AddSnail(int(time.Now().Unix()), ctx.Options["name"].Value.(string), "", "", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-				_ = ctx.Respond(helpers.GetDefaultResponse("add subcommand.", true, ctx))
+				snail, err = player.AddSnail(int(time.Now().Unix()), ctx.Options["name"].StringValue(), "", "", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+				if err != nil {
+					_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, there was a problem adding your snail. Paging <pingCaretakerRole> to review the log", true, ctx))
+					log.Errorw("Error adding snail in /snail add", "err", err)
+					return
+				}
+				_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("Thanks for telling me about %s! Please use `/snail update %s` to tell me more about them.", snail.SnailName, snail.SnailName), true, ctx))
 			}),
 		},
 		{ // list command
@@ -109,17 +113,14 @@ var Snail = &disgolf.Command{
 				Required:    true,
 			}},
 			Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-				snails, err := getSnails(ctx)
-				if _, isErr := err.(alreadyResponded); isErr { // response has already been sent
+				snail, err := getSnail(ctx, ctx.Options["name"].StringValue())
+				if err != nil { // logged and responded in function
 					return
 				}
-				for _, snail := range snails {
-					if snail.SnailName == ctx.Options["name"].Value {
-						_ = ctx.Respond(helpers.GetDefaultResponse(formatSnailStats(snail), true, ctx))
-						return
-					}
+				if snail == nil {
+					_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("Sorry, looks like you haven't told me about %s. Maybe you could `/snail add` them.", ctx.Options["name"].StringValue()), true, ctx))
 				}
-				_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("Sorry, looks like you haven't told me about %s. Maybe you could `/snail add` them.", ctx.Options["name"].Value), true, ctx))
+				_ = ctx.Respond(helpers.GetDefaultResponse(formatSnailStats(snail), true, ctx))
 			}),
 		},
 		/* help subcommand is unimplemented
@@ -130,14 +131,31 @@ var Snail = &disgolf.Command{
 				_ = ctx.Respond(helpers.GetDefaultResponse("help subcommand.", true, ctx))
 			}),
 		},*/
-		{
+		{ // update command
 			Name:        "update",
 			Description: "Update your snails' stats.",
-			Options:     updateOptions,
+			Options:     snailStatsOptions,
 			Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-				_ = ctx.Respond(helpers.GetDefaultResponse("show subcommand.", true, ctx))
+				err := updateSnail(ctx)
+				if _, isErr := err.(alreadyResponded); isErr { // response has already been sent
+					return
+				}
+				if err != nil {
+					_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, there was a problem updating your snail. Paging <pingCaretakerRole> to review the log", true, ctx))
+					// error already logged in updateSnail()
+					return
+				}
+				_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("Thanks! I've updated what I know about %s. You can use `/snail show %s` to confirm it.", ctx.Options["name"].StringValue(), ctx.Options["name"].StringValue()), true, ctx))
 			}),
 		},
+		/* setserver requires another interaction step, making it a more complex interaction, worry about it later
+		{
+			Name:        "setserver",
+			Description: "Set what server your snail is on.",
+			Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
+				_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, setserver isn't implemented yet. Ask Mehh for assistance.", true, ctx))
+			}),
+		},*/
 	}),
 }
 
@@ -146,12 +164,14 @@ func getSnails(ctx *disgolf.Ctx) ([]*sheetDAO.Snail, error) {
 	// get list of snails from DB by disco username ctx.Interaction.Member.User.Username
 	player, err := sheetDAO.GetPlayerByDiscoId(ctx.Interaction.Member.User.Username)
 	if err != nil {
-		_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, there was a problem looking up your player data. Paging <pingCaretakerRole> for assistance.", true, ctx))
+		_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, there was a problem looking up your player data. Paging <pingCaretakerRole> to review the log", true, ctx))
+		log.Errorw("Error retrieving player in getSnails()", "err", err)
 		return nil, responded
 	}
 	snails, err := player.GetSnails()
 	if err != nil {
-		_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, there was a problem looking up your snail data. Paging <pingCaretakerRole> for assistance.", true, ctx))
+		_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, there was a problem looking up your snail data. Paging <pingCaretakerRole> to review the log", true, ctx))
+		log.Errorw("Error retrieving snails in getSnails()", "err", err)
 		return nil, responded
 	}
 	if len(snails) == 0 {
@@ -160,6 +180,19 @@ func getSnails(ctx *disgolf.Ctx) ([]*sheetDAO.Snail, error) {
 	}
 
 	return snails, nil
+}
+
+func getSnail(ctx *disgolf.Ctx, name string) (*sheetDAO.Snail, error) {
+	snails, err := getSnails(ctx)
+	if err != nil {
+		return nil, err
+	}
+	for _, snail := range snails {
+		if strings.EqualFold(snail.SnailName, name) {
+			return snail, nil
+		}
+	}
+	return nil, nil
 }
 
 func formatSnailStats(snail *sheetDAO.Snail) string {
@@ -176,7 +209,75 @@ func formatSnailStats(snail *sheetDAO.Snail) string {
 	return sb.String()
 }
 
-var updateOptions = []*discordgo.ApplicationCommandOption{
+func updateSnail(ctx *disgolf.Ctx) error {
+	var responded alreadyResponded = ""
+	snail, err := getSnail(ctx, ctx.Options["name"].StringValue())
+	if err != nil {
+		return err
+	}
+	for key, option := range ctx.Options {
+		switch key {
+		case "name":
+			// do nothing with name
+		case "leadership":
+			snail.Leadership = int(option.IntValue())
+		case "speciesessences":
+			snail.SpeciesWarEssences = int(option.IntValue())
+		case "totalpower":
+			// TODO: do some interpretation here!
+		case "art":
+			snail.Art = int(option.IntValue())
+		case "fth":
+			snail.Fth = int(option.IntValue())
+		case "fame":
+			snail.Fame = int(option.IntValue())
+		case "civ":
+			snail.Civ = int(option.IntValue())
+		case "tech":
+			snail.Tech = int(option.IntValue())
+		case "hp":
+			snail.Hp = int(option.IntValue())
+		case "atk":
+			snail.Atk = int(option.IntValue())
+		case "rush":
+			snail.Rush = int(option.IntValue())
+		case "def":
+			snail.Def = int(option.IntValue())
+		case "zombie":
+			snail.ZombieForm = int(option.IntValue())
+		case "demon":
+			snail.DemonForm = int(option.IntValue())
+		case "angel":
+			snail.AngelForm = int(option.IntValue())
+		case "mutant":
+			snail.MutantForm = int(option.IntValue())
+		case "mecha":
+			snail.MechaForm = int(option.IntValue())
+		case "dragon":
+			snail.DragonForm = int(option.IntValue())
+		case "newname":
+			//lint:ignore SA6000 looping over a map, this only triggers once
+			if match, err := regexp.MatchString("^[0-9a-zA-Z_-]+$", option.StringValue()); !match || err != nil {
+				_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("%s doesn't look like a valid name. Just what stunt are you trying to pull here?\nOnly allowing letters, numbers, _, and -. Because I couldn't find a list of characters the game considers valid.", option.StringValue()), true, ctx))
+				return responded
+			}
+			sn, _ := getSnail(ctx, option.StringValue())
+			if sn != nil {
+				_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("Sorry, you already have a snail named %s so I can't perform your update. You can use `/snail list` to see all your snails.", option.StringValue()), true, ctx))
+				return responded
+			}
+			snail.SnailName = option.StringValue()
+		}
+	}
+	err = snail.UpdateThisSnail()
+	if err != nil {
+		log.Errorw("error updating snail", "err", err, "snail", snail, "changes", ctx.Options)
+		return err
+	}
+	return nil
+}
+
+var snailStatsOptions = []*discordgo.ApplicationCommandOption{
 	{
 		Type:        discordgo.ApplicationCommandOptionString,
 		Name:        "name",
@@ -280,7 +381,7 @@ var updateOptions = []*discordgo.ApplicationCommandOption{
 	{
 		Type:        discordgo.ApplicationCommandOptionInteger,
 		Name:        "zombie",
-		Description: "Zombie form tier)",
+		Description: "Zombie form tier",
 		MinValue:    &integerOptionZeroValue,
 		// MaxValue:    10,
 		Required: false,
@@ -330,19 +431,5 @@ var updateOptions = []*discordgo.ApplicationCommandOption{
 		Name:        "newname",
 		Description: "Change your snail's name",
 		Required:    false,
-	},
-	{
-		Type:        discordgo.ApplicationCommandOptionString,
-		Name:        "server",
-		Description: "Game server name",
-		Required:    false,
-	},
-	{
-		Type:        discordgo.ApplicationCommandOptionInteger,
-		Name:        "servernum",
-		Description: "Game server number",
-		MinValue:    &integerOptionZeroValue,
-		// MaxValue:    10,
-		Required: false,
 	},
 }

@@ -35,10 +35,8 @@ var dataTabs = []rosterTab{
 func main() {
 	defer os.Exit(0)
 	defer tidy()
-	// manual roster sheet "1kulg2agXhCRbrdYDtYf5ggq_8U2yWkib_gxUx7mV2II"
-	// test DB sheet "18pqTrKEncHH2RJ9-R3wUKnN4gEjKaXzE0KvxUaxkiXo"
-	sourceSheet := "1kulg2agXhCRbrdYDtYf5ggq_8U2yWkib_gxUx7mV2II"
-	destinationSheet := "18pqTrKEncHH2RJ9-R3wUKnN4gEjKaXzE0KvxUaxkiXo"
+	sourceSheet := config.Values.SheetId
+	destinationSheet := config.Values.DbSheetId
 
 	err := sheetDAO.Initialize(destinationSheet, config.Values.Secrets.GetServiceAccountKey())
 	check.Err(err)
