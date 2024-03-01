@@ -7,6 +7,7 @@ import (
 	"time"
 	"walrusbot/bot/assignment"
 	botcommands "walrusbot/bot/commands"
+	"walrusbot/sheetDAO"
 	"walrusbot/utility/check"
 	"walrusbot/utility/config"
 	"walrusbot/utility/log"
@@ -19,23 +20,36 @@ var (
 	BotId string
 )
 
+func tidy() {
+	log.FastLogger.Sync() // flushes buffer, if any
+	config.Cleanup()      // cleans up SA key
+}
+
 func main() {
+	log.Infow("config loaded", "config", config.Values)
+	if config.Values.Debug["appLogs"] {
+		log.SetLevelDebug()
+	}
+	log.Infow("loading sheet DAO")
+	err := sheetDAO.Initialize(config.Values.DbSheetId, config.Values.Secrets.GetServiceAccountKey())
+	check.Err(err)
+
 	log.Infow("Inited, main starting up...")
-	defer log.FastLogger.Sync() // flushes buffer, if any
+	defer tidy()
 
 	// check the bot is minimally functional before loading any data
-	bot, err := disgolf.New(config.Values.Token)
+	bot, err := disgolf.New(config.Values.Secrets.GetBotToken())
 	check.Err(err, "failed to init disgolf")
+
+	bot.Session.Debug = config.Values.Debug["discgoLogs"]
 
 	// initial cache of assignment data
 	assignment.CacheAssignments()
 
-	bot.Router.Register(botcommands.MyAssignment)
-	bot.Router.Register(botcommands.MyAss)
-	bot.Router.Register(botcommands.RefreshAssignment)
+	botcommands.Load(bot)
 
 	bot.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
-		log.Infow("Bot is up!")
+		log.Infow("Bot session opened")
 	})
 	bot.AddHandler(bot.Router.HandleInteraction)
 	// lets just not respond to DMs at all for now.
@@ -55,6 +69,8 @@ func main() {
 	if err != nil {
 		log.Fatalw("cannot publish commands", "err", err)
 	}
+	log.Infow("Bot is up!")
+
 	stchan := make(chan os.Signal, 1)
 	signal.Notify(stchan, syscall.SIGTERM, os.Interrupt, syscall.SIGSEGV)
 end:

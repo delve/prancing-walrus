@@ -22,16 +22,25 @@ var MyAssignment = &disgolf.Command{
 			},
 		})
 	}),
+
+	// Middlewares array executes (before? after?) (Message)Handler. because???
+	Middlewares: []disgolf.Handler{
+		disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
+			fmt.Printf("In Middleware Ctx: %v\n", ctx)
+			ctx.Next()
+		}),
+	},
+
 	// MessageHandlers handle DMs, but only if they contain the configured prefix
 	MessageHandler: disgolf.MessageHandlerFunc(func(ctx *disgolf.MessageCtx) {
 		// TODO: ctx Reply is different from Respond HOW??
 		_, _ = ctx.Reply(fmt.Sprintf("In MessageHandler: MessageCtx: %v\n", ctx), true)
 	}),
 
-	// Middlewares array executes (before? after?) (Message)Handler. because???
-	Middlewares: []disgolf.Handler{
-		disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-			fmt.Printf("In Middleware Ctx: %v\n", ctx)
+	// MessageMiddlewares array executes (before? after?) (Message)Handler. because???
+	MessageMiddlewares: []disgolf.MessageHandler{
+		disgolf.MessageHandlerFunc(func(ctx *disgolf.MessageCtx) {
+			fmt.Println("middleware")
 			ctx.Next()
 		}),
 	},

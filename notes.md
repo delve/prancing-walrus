@@ -6,3 +6,5 @@
 * containers on VMs: https://cloud.google.com/compute/docs/containers/deploying-containers#:~:text=Deploying%20a%20container%20on%20a%20new%20VM%20instance,-You%20can%20deploy&text=Go%20to%20the%20Create%20an%20instance%20page.&text=Specify%20the%20VM%20details.,the%20container%20for%20your%20needs.
 * possibly useful link for customizing buildpack output: https://stackoverflow.com/questions/69447497/is-it-possible-to-customize-docker-image-generated-with-spring-native-with-buil
 * debugging under gitpod: https://www.gitpod.io/docs/introduction/languages/go#debugging-your-go-application-in-gitpod
+* secret access via Go API https://rotational.io/blog/secrets-manager-with-go/
+* including extra resources in buildpack: https://stackoverflow.com/questions/69447497/is-it-possible-to-customize-docker-image-generated-with-spring-native-with-buil

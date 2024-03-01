@@ -1,10 +1,12 @@
 https://gitpod.io/#https://github.com/delve/prancing-walrus
 # prancing-walrus
 ## TODO
+* fix debug launch profile so it runs main.go for whichever module the active file is part of
 ### Before 1.0
 * automate version tagging & publishing (makefile)
 * automate deployment (makefile)
 * replace as many Panics as possible with proper error handling
+* Extract user input sanitizing into the data model somehow
 * on /refreshassignments add a discord name check and warn on incorrect names.
 * Add backoff-retry logic around accessing the spreadsheet
 * Look into backoff-retry in the discord commands, to recover from discord outages
@@ -23,13 +25,31 @@ https://gitpod.io/#https://github.com/delve/prancing-walrus
 * several spots that assume only one guild (EG ctx.Session.State.Guilds[0]). these should be fixed
 
 # Discord perms nded
-Scope: Bot
-* Read messages/view channels
-* Send messages
-* Use External emoji
-* Use external stickers
-* Add reactions
-* Use slash comands
+Scopes: Bot + applications.commands
+* General Perms
+* * Manage Roles
+* * Read messages/view channels
+* Text Perms
+* * Send messages
+* * Create public threads
+* * Create private threads
+* * Send messages in threads
+* * Manage messages
+* * Manage threads
+* * Embed links
+* * Read message history
+* * Use External emoji
+* * Use external stickers
+* * Add reactions
+* * Use slash comands
+* * Use external emoji
+* * Use external stickers
+* * Add reactions
+* * Use slash commands
+
+Invite URL for test app
+https://discord.com/oauth2/authorize?client_id=1170099827611291761&permissions=534992219200&scope=bot+applications.commands
+
 # Dev-ing
 ## prereq
 set CONFIG, APIKey, and BOT_TOKEN env vars for this repo in gitpod user settings. CONFIG should be '../devconfig.json', BOT_TOKEN should be the bot token from Discord. Get yer own. The devconfig has a test app id and specific server id so as to not interfere with the 'production' bot.
@@ -37,6 +57,17 @@ set CONFIG, APIKey, and BOT_TOKEN env vars for this repo in gitpod user settings
 does app id need to be per dev also? worry about it when it's not just me. at some point consider loading both configs with merge/overwrite logic to reduce duplication
 
 PROD BOT_TOKEN and sheets APIKey stored in GCP Secrets Manager
+
+* to enable local service account impersonation through ADC for dev work:
+* * mymail=the email address of your gcp user id
+* * prj=`gcloud config get-value project`;useremail="user:${mymail}"
+* * to enable SA token creation `gcloud projects add-iam-policy-binding ${prj} --member=${useremail} --role="roles/iam.serviceAccountTokenCreator"`
+* * note that this can apparently take up to ten minutes to actually apply, which is incredibly frustrating when you're debugging something.
+* * also note that apparently 'roles/owner' does NOT include this, for whatever reason.
+
+## DB modules
+During workspace setup the gsheets and sheetdb module repos are cloned into /workspace.The workspace's `go.work` file include replacement directives for these modules such that you will always load those from your local copy (which should be checked out at the version tag from walrusbot's `go.mod` file, HOWEVER TODO: need to automate which version tag is checked out). Therefore if there is a bug in one of these modules you can edit it locally to troubleshoot and fix it, tag and push the new version, and finally update the version in the `go.mod` files of the prancing-walrus repo.
+
 ## Run
 `F5` for interactive debugging in VSCode with the 'Launch Package' profile
 `make run` to compile and execute local code
@@ -47,48 +78,40 @@ PROD BOT_TOKEN and sheets APIKey stored in GCP Secrets Manager
 # Hosting
 GCP GCE. cloud run was too expensive.
 
+TODO: consider Terraform :(
+
 * create project
 * enable APIs
 * * GCE
 * * Cloud logging
 * * Artifact Registry
+* * Identity and Access Management (IAM) API
 * create Artifact Registy docker registry colocated with GCE instance (usc1) with a cleanup policy keep latest 5 images. immutable tags seems to prevent deletion, so don't enable it to avoid ballooning storage & cost
+* create service account `walrus-sheet-access`
+* * --command to create SA--
+* * add permissions
+* * * prj=`gcloud config get-value project`;saId="serviceAccount:walrus-sheet-access@prancingwalrus.iam.gserviceaccount.com"
+* * * for logging `gcloud projects add-iam-policy-binding ${prj} --member=${saId} --role=roles/logging.logWriter`
+* * * for artifact registry `gcloud projects add-iam-policy-binding ${prj} --member=${saId} --role=roles/artifactregistry.reader`
+* * * for secrets manager read access `gcloud projects add-iam-policy-binding ${prj} --member=${saId} --role="roles/secretmanager.secretAccessor"`
+* * * te generate SA key for sheets access `gcloud projects add-iam-policy-binding ${prj} --member=${saId} --role="roles/iam.serviceAccountKeyAdmin"`
 
-
-deploy container 
+* * * add SA email to gsheet permissions as editor
+* setup secretmanager
+* * add bot token
+* * add API key (this is for sheets, probably don't need it anymore?!?)
+* * create key for SA from IAM Service Accounts > ...s > Manage keys > Add Key > Create New Key > JSON, create
+* * upload key file to secret manager, delete local file.
+* create VM
+* * select deploy container 
+```
 us-central1-docker.pkg.dev/prancingwalrus/prancing-walrus/prancing-walrus:v0.01
 container env
 BOT_TOKEN
 <insert BOT_TOKEN here>
 APIKey
 <insert APIKey here>
-
-
-* create VM
-* * sudo apt install git
-* * curl --output /tmp/go1.21.3.linux-amd64.tar.gz https://dl.google.com/go/go1.21.3.linux-amd64.tar.gz
-* * sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf /tmp/go1.21.3.linux-amd64.tar.gz
-* * git clone https://github.com/delve/prancing-walrus.git
-* * git checkout <prodbranch>
-* set startup script TODO: secrets management yo?
 ```
-export BOT_TOKEN=<token>
-export APIKey=<key>
-export GOCACHE='/home/delve202/.cache/go-build'
-export GOMODCACHE='/home/delve202/go/pkg/mod'
-export GOPATH='/home/delve202/go'
-cd /home/delve202/prancing-walrus/walrusbot
-git config --global --add safe.directory /home/delve202/prancing-walrus
-echo "Git Pull" > /tmp/log.txt
-echo "---------" >> /tmp/log.txt
-git pull &>> /tmp/log.txt
-echo "---------" >> /tmp/log.txt
-echo "Go Env" >> /tmp/log.txt
-echo "---------" >> /tmp/log.txt
-/usr/local/go/bin/go env &>> /tmp/log.txt
-echo "---------" >> /tmp/log.txt
-echo "Go Run" >> /tmp/log.txt
-echo "---------" >> /tmp/log.txt
-/usr/local/go/bin/go run . &>> /tmp/log.txt
-```
-* reboot or manually exec startup script
+* * * TODO: secrets management yo?
+* * service account: walrus-sheet-access
+* * set custom metadata google-logging-enabled	true

@@ -7,6 +7,7 @@ import (
 var (
 	Logger     *zap.SugaredLogger
 	FastLogger *zap.Logger
+	cfg        zap.Config
 )
 
 func init() {
@@ -34,12 +35,15 @@ func Errorw(msg string, keysAndValues ...interface{}) {
 
 func getLogger() (err error) {
 	err = nil
-	// TODO: NewProduction is a canned set of production-ready configs for the logger.
-	//       expand to customizable configs and enable changing log level. from env var? updating via chat cmds?
-	FastLogger, err = zap.NewProduction()
-	if err != nil {
-		return
-	}
+	cfg = zap.NewProductionConfig()
+
+	FastLogger = zap.Must(cfg.Build())
+
 	Logger = FastLogger.Sugar()
 	return
+}
+
+func SetLevelDebug() {
+	cfg.Level.SetLevel(zap.DebugLevel)
+	Infow("updated log level", "level", "debug")
 }

@@ -23,17 +23,6 @@ var MyAssignment = &disgolf.Command{
 		log.Infow("In Handler", "command", "myassignment", "channel", thisChan.Name, "user", ctx.Interaction.Member.User.Username)
 		requestAssignment(ctx, false)
 	}),
-	MessageHandler: disgolf.MessageHandlerFunc(func(ctx *disgolf.MessageCtx) {
-		_, _ = ctx.Reply(fmt.Sprintf("In MessageHandler: MessageCtx: %v\n", ctx), true)
-	}),
-
-	// Middlewares array executes (before? after?) a / command handler. because???
-	Middlewares: []disgolf.Handler{
-		disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-			fmt.Printf("In Middleware Ctx: %v\n", ctx)
-			ctx.Next()
-		}),
-	},
 }
 
 var MyAss = &disgolf.Command{
@@ -44,9 +33,6 @@ var MyAss = &disgolf.Command{
 		thisChan, _ := ctx.Channel(ctx.Interaction.ChannelID)
 		log.Infow("In Handler", "command", "myass", "channel", thisChan.Name, "user", ctx.Interaction.Member.User.Username)
 		requestAssignment(ctx, true)
-	}),
-	MessageHandler: disgolf.MessageHandlerFunc(func(ctx *disgolf.MessageCtx) {
-		_, _ = ctx.Reply(fmt.Sprintf("In MessageHandler: MessageCtx: %v\n", ctx), true)
 	}),
 }
 

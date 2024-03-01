@@ -1,18 +1,34 @@
 {
-    "Token": "", 
-    "APIKey": "",
     "BotPrefix": ["w.", "walrus."],
+    "GcpProject": "prancingwalrus",
     "AppId": "1170099827611291761",
     "ServerId": "775636532161019955",
     "WarPlanningChannels": [
         "🧬・prancingwalrustests",
-        "🧬・species-war",
         "👥・species-war",
         "🏯・species-war"
     ],
+    "TestSheetId": "1IwlPZuguMh6e7gMDS3PlTjsjBEDa8lBJrnImKPm8UA4",
+    "LiveSheetId": "1IwlPZuguMh6e7gMDS3PlTjsjBEDa8lBJrnImKPm8UA4",
     "SheetId": "1IwlPZuguMh6e7gMDS3PlTjsjBEDa8lBJrnImKPm8UA4",
+    "DbSheetId": "18pqTrKEncHH2RJ9-R3wUKnN4gEjKaXzE0KvxUaxkiXo",
     "Roles": {
         "CaretakerRole": "foo",
         "CanRefresh": "foo"
+    },
+    "Debug": {
+        "appLogs": true,
+        "discgoLogs": false
+    },
+    "GcpSAName": "walrus-sheet-access@prancingwalrus.iam.gserviceaccount.com",
+    "SMgrSecretList": {
+        "botToken": "test_token",
+        "SheetsAPIKey": "SheetsAPIKey",
+        "SheetsOauth": "SheetsOauth"
+    },
+    "SMgrSecretDescriptions": {
+        "botToken": "the bot token for discord auth",
+        "SheetsAPIKey": "API key for non IAM auth to manual sheet",
+        "SheetsOauth": "TBH i don't really know! D:"
     }
 }

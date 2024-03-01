@@ -18,4 +18,12 @@
 # vendor/
 
 # Go workspace file
-go.work
+# WHAT? NO! i don't want to set up the workspace every time i start a gitpod!
+# don't ignore these!
+# go.work
+
+# temp src copy to support import. because it's just easier.
+importWalrusDb/sheetDAO
+importWalrusDb/utility
+importWalrusDb/devconfig.json
+importWalrusDb/config.json
