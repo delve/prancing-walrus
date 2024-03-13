@@ -12,7 +12,7 @@
     "DbSheetId": "1FXsdxuMW5gqO0s6pJJ9oIxLmbV_K4qdae0-yoWfHNIo",
     "Roles": {
         "CaretakerRole": "Walrus Wranglers",
-        "CanRefresh": "Manager"
+        "CanRefresh": "Walrus Wranglers"
     },
     "Debug": {
         "appLogs": false,

@@ -1,4 +1,4 @@
-containerVersion = v0.05
+containerVersion = v0.06
 debugVersion = test
 
 MODELS_DIR := ./walrusbot/sheetDAO
