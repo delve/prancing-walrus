@@ -31,12 +31,16 @@ type rosterTab struct {
 }
 
 var dataTabs = []rosterTab{
-	{club: "Escargot",
-		tabname:     "Roster",
+	{club: "One Shell",
+		tabname:     "OS Roster",
 		headerRange: "A1:P1",
 		dataRange:   "A2:P"},
-	{club: "Silken Pagoda",
-		tabname:     "Silken Roster",
+	{club: "You Shell Not Pass",
+		tabname:     "YSNP Roster",
+		headerRange: "A1:P1",
+		dataRange:   "A2:P"},
+	{club: "Zenith",
+		tabname:     "Zenith Roster",
 		headerRange: "A1:P1",
 		dataRange:   "A2:P"},
 }
