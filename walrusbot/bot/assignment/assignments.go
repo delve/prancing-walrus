@@ -3,6 +3,8 @@ package assignment
 import (
 	"context"
 	"fmt"
+	"slices"
+	"walrusbot/sheetDAO"
 	"walrusbot/utility/check"
 	"walrusbot/utility/config"
 	"walrusbot/utility/log"
@@ -28,21 +30,110 @@ type assignment struct {
 
 type rosterTab struct {
 	club, tabname, headerRange, dataRange string
+	key                                   int
 }
 
 var dataTabs = []rosterTab{
-	{club: "One Shell",
+	{club: "The One Shell",
 		tabname:     "OS Roster",
 		headerRange: "A1:P1",
-		dataRange:   "A2:P"},
+		dataRange:   "A2:P",
+		key:         0},
 	{club: "You Shell Not Pass",
 		tabname:     "YSNP Roster",
 		headerRange: "A1:P1",
-		dataRange:   "A2:P"},
+		dataRange:   "A2:P",
+		key:         0},
 	{club: "Zenith",
 		tabname:     "Zenith Roster",
 		headerRange: "A1:P1",
-		dataRange:   "A2:P"},
+		dataRange:   "A2:P",
+		key:         0},
+}
+
+func CalculateAssignments() error {
+	log.Infow("calculating all kit assignments")
+	errs := []string{}
+
+	for _, club := range dataTabs {
+		clubRec, err := sheetDAO.GetClubByName(club.club)
+		if err != nil {
+			errs = append(errs, club.club)
+			continue
+		}
+		err = calculateClubAssignments(clubRec.ClubID, club.club)
+		if err != nil {
+			errs = append(errs, club.club)
+		}
+	}
+	if len(errs) > 0 {
+		return fmt.Errorf("club assignments failed for %v", errs)
+	}
+	log.Infow("kit assignments complete")
+	return nil
+}
+
+func calculateClubAssignments(club int, clubname string) error {
+	log.Infow("calculating kit assignments for club", "clubId", club, "clubName", clubname)
+	// get club snails, sorted by leadership ascending
+	clubFilter := func(snail *sheetDAO.Snail) bool { return snail.Club == club }
+	leaderSort := func(snails []*sheetDAO.Snail) {
+		slices.SortStableFunc(snails,
+			func(a, b *sheetDAO.Snail) int { return a.Leadership - b.Leadership })
+	}
+
+	snails, err := sheetDAO.GetAllSnails(sheetDAO.SnailFilter(clubFilter), sheetDAO.SnailSort(leaderSort))
+	if err != nil {
+		return err
+	}
+	if len(snails) < 1 {
+		log.Infow("no snails found to assign kits", "clubId", club, "clubName", clubname)
+		return nil
+	}
+	// define kit counts
+	kitCount := map[rune]int{
+		'l': 0,
+		'p': 0,
+		'v': 0,
+	}
+	kitCount['l'] = len(snails) - 50
+	if kitCount['l'] < 0 {
+		kitCount['l'] = 0
+	}
+
+	if len(snails) > 25 {
+		kitCount['p'] = 25
+	} else {
+		kitCount['p'] = len(snails)
+	}
+
+	kitCount['v'] = len(snails) - kitCount['p'] - kitCount['l']
+
+	// make assignments
+	snailCursor := 0
+	rank := len(snails)
+	for i := kitCount['l']; i > 0; i, snailCursor, rank = i-1, snailCursor+1, rank-1 {
+		//assign to l
+		snails[snailCursor].SWKit = "laborer"
+		snails[snailCursor].SWKitRank = rank
+		snails[snailCursor].UpdateThisSnail()
+		// fmt.Printf("%s laborer %d: %d - %s\n", clubname, i, snails[snailCursor].Leadership, snails[snailCursor].SnailName)
+	}
+	for i := kitCount['p']; i > 0; i, snailCursor, rank = i-1, snailCursor+1, rank-1 {
+		//assign to p
+		snails[snailCursor].SWKit = "prospector"
+		snails[snailCursor].SWKitRank = rank
+		snails[snailCursor].UpdateThisSnail()
+		// fmt.Printf("%s prospector %d: %d - %s\n", clubname, i, snails[snailCursor].Leadership, snails[snailCursor].SnailName)
+	}
+	for i := kitCount['v']; i > 0; i, snailCursor, rank = i-1, snailCursor+1, rank-1 {
+		//assign to v
+		snails[snailCursor].SWKit = "vanguard"
+		snails[snailCursor].SWKitRank = rank
+		snails[snailCursor].UpdateThisSnail()
+		// fmt.Printf("%s vanguard %d: %d - %s\n", clubname, i, snails[snailCursor].Leadership, snails[snailCursor].SnailName)
+	}
+	return nil
 }
 
 func CacheAssignments() {
@@ -51,15 +142,6 @@ func CacheAssignments() {
 	assignments = map[string]assignment{}
 
 	ctx := context.Background()
-	// This might be needed for OAUTH2, and the commented NewService line below
-	// b, err := os.ReadFile("credentials.json")
-	// check.Err(err, "Unable to read client secret file")
-	// If modifying these scopes, delete your previously saved token.json.
-	// config, err := google.ConfigFromJSON(b, "https://www.googleapis.com/auth/spreadsheets.readonly")
-	// check.Err(err, "Unable to parse client secret file to config")
-	// client := getClient(config)
-
-	// srv, err := sheets.NewService(ctx, option.WithHTTPClient(client))
 	srv, err := sheets.NewService(ctx, option.WithAPIKey(config.Values.Secrets.GetSheetsApiKey()))
 	check.Err(err, "Unable to retrieve Sheets client")
 

@@ -19,17 +19,25 @@ import (
 
 type rosterTab struct {
 	club, tabname, headerRange, dataRange string
+	key                                   int
 }
 
 var dataTabs = []rosterTab{
-	{club: "Escargot",
-		tabname:     "Roster",
+	{club: "The One Shell",
+		tabname:     "OS Roster",
 		headerRange: "A1:P1",
-		dataRange:   "A2:C"},
-	{club: "Silken Pagoda",
-		tabname:     "Silken Roster",
+		dataRange:   "A2:P",
+		key:         0},
+	{club: "You Shell Not Pass",
+		tabname:     "YSNP Roster",
 		headerRange: "A1:P1",
-		dataRange:   "A2:C"},
+		dataRange:   "A2:P",
+		key:         0},
+	{club: "Zenith",
+		tabname:     "Zenith Roster",
+		headerRange: "A1:P1",
+		dataRange:   "A2:P",
+		key:         0},
 }
 
 func main() {
@@ -41,7 +49,7 @@ func main() {
 	err := sheetDAO.Initialize(destinationSheet, config.Values.Secrets.GetServiceAccountKey())
 	check.Err(err)
 
-	players, err := sheetDAO.GetPlayers()
+	players, err := sheetDAO.GetAllPlayers()
 	check.Err(err)
 	log.Infow("Found DB players", "count", len(players))
 
@@ -54,6 +62,9 @@ func main() {
 		log.Infow("snailDB operation failed, will retry", "error", err, "retryDelay", delay)
 	}
 	for _, tab := range dataTabs {
+		club, err := sheetDAO.GetClubByName(tab.club)
+		check.Err(err)
+
 		headerRange := fmt.Sprintf("'%s'!%s", tab.tabname, tab.headerRange)
 		headerData, err := srv.Spreadsheets.Values.Get(sourceSheet, headerRange).Do()
 		check.Err(err, "Unable to retrieve data from sheet")
@@ -104,7 +115,9 @@ func main() {
 					p.PlayerID,
 					int(time.Now().Unix()),
 					snailName,
-					tab.club,
+					club.ClubID,
+					"",
+					0,
 					sheetDAO.DeepFried,
 					18,
 					leadership,

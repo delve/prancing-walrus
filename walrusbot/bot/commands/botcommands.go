@@ -13,6 +13,8 @@ var Commands = []*disgolf.Command{
 	assignment.MyAssignment,
 	assignment.MyAss,
 	assignment.RefreshAssignment,
+	assignment.CalculateAssignment,
+	assignment.ViewAssignments,
 	snail.Snail,
 }
 

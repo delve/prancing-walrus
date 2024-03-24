@@ -69,7 +69,7 @@ var Snail = &disgolf.Command{
 					return
 				}
 
-				snail, err = player.AddSnail(int(time.Now().Unix()), ctx.Options["name"].StringValue(), "", "", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+				snail, err = player.AddSnail(int(time.Now().Unix()), ctx.Options["name"].StringValue(), 0, "", 0, "", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 				if err != nil {
 					_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, there was a problem adding your snail. Paging <pingCaretakerRole> to review the log", true, ctx))
 					log.Errorw("Error adding snail in /snail add", "err", err)
@@ -196,9 +196,10 @@ func getSnail(ctx *disgolf.Ctx, name string) (*sheetDAO.Snail, error) {
 }
 
 func formatSnailStats(snail *sheetDAO.Snail) string {
+	club, _ := sheetDAO.GetClub(snail.Club)
 	var sb strings.Builder
 	sb.WriteString(fmt.Sprintf("This is everything I know about %s.\n", snail.SnailName))
-	sb.WriteString(fmt.Sprintf("Server: %s %d\tClub: %s\n", snail.Server, snail.ServerNum, snail.Club))
+	sb.WriteString(fmt.Sprintf("Server: %s %d\tClub: %s\n", snail.Server, snail.ServerNum, club.Name))
 	sb.WriteString(fmt.Sprintf("Leadership: %d\tHoarded SW Essences: %d\n", snail.Leadership, snail.SpeciesWarEssences))
 	sb.WriteString(fmt.Sprintf("Total Power: %d\n", snail.TotalPower))
 	sb.WriteString(fmt.Sprintf("__AFFCT__\nArt \t%d\tFaith\t%d\nFame\t%d\tCiv\t%d\nTech \t%d\n", snail.Art, snail.Fth, snail.Fame, snail.Civ, snail.Tech))

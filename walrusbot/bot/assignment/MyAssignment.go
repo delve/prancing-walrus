@@ -3,6 +3,7 @@ package assignment
 import (
 	"fmt"
 	"strings"
+	"walrusbot/sheetDAO"
 	"walrusbot/utility/check"
 	"walrusbot/utility/config"
 	"walrusbot/utility/helpers"
@@ -67,6 +68,83 @@ var RefreshAssignment = &disgolf.Command{
 	}),
 }
 
+var CalculateAssignment = &disgolf.Command{
+	Name:        "calculateassignments",
+	Description: "Calculate the species war assignments based on player entered data",
+	Type:        discordgo.ChatApplicationCommand,
+	Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
+		thisChan, err := ctx.Channel(ctx.Interaction.ChannelID)
+		check.Err(err)
+		log.Infow("In Handler", "command", "calculateassignments", "channel", thisChan.Name, "user", ctx.Interaction.Member.User.Username)
+
+		refreshRoleId, err := helpers.GetRoleId(ctx, config.Values.Roles["CanRefresh"])
+		if refreshRoleId == "" || err != nil {
+			log.Errorw("error finding role ID", "roleTag", "CanRefresh", "configuredRole", config.Values.Roles["CanRefresh"], "error", err)
+			return
+		}
+
+		if helpers.CheckroleMembership(ctx, refreshRoleId) {
+			_ = ctx.Respond(helpers.GetDefaultResponse("Calculating kit assignments.", false, ctx))
+			CalculateAssignments()
+			// TODO: this doesn't come out if placed here. Make it happen.
+			// _ = ctx.Respond(&discordgo.InteractionResponse{
+			// 	Type: discordgo.InteractionResponseChannelMessageWithSource,
+			// 	Data: &discordgo.InteractionResponseData{
+			// 		Content: "Assignment calculation completed.",
+			// 	},
+			// })
+		} else {
+			_ = ctx.Respond(helpers.GetDefaultResponse("This command is not available to this user in this context.", true, ctx))
+		}
+	}),
+}
+
+var ViewAssignments = &disgolf.Command{
+	Name:        "viewassignments",
+	Description: "Calculate the species war assignments based on player entered data",
+	Type:        discordgo.ChatApplicationCommand,
+	Options: []*discordgo.ApplicationCommandOption{{
+		Type:        discordgo.ApplicationCommandOptionString,
+		Name:        "club",
+		Description: "Name of the club to view",
+		Required:    false,
+	}},
+	Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
+		thisChan, err := ctx.Channel(ctx.Interaction.ChannelID)
+		check.Err(err)
+		clubName := ""
+		val, ok := ctx.Options["club"]
+
+		if ok {
+			log.Infow("In Handler", "command", "viewassignments", "channel", thisChan.Name, "user", ctx.Interaction.Member.User.Username, "club", val.StringValue())
+			clubName = val.StringValue()
+		} else {
+			log.Infow("In Handler", "command", "viewassignments", "channel", thisChan.Name, "user", ctx.Interaction.Member.User.Username, "club", "")
+			player, err := sheetDAO.GetPlayerByDiscoId(ctx.Interaction.Member.User.Username)
+			if err == nil {
+				snails, err := player.GetSnails()
+				if err == nil {
+					cr, err := sheetDAO.GetClub(snails[0].Club)
+					if err == nil {
+						clubName = cr.Name
+					}
+				}
+			}
+		}
+
+		if !slices.Contains(config.Values.WarPlanningChannels, thisChan.Name) {
+			_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("This command is only available from these channels %v", config.Values.WarPlanningChannels), true, ctx))
+		}
+
+		if !canListAssignments(ctx, clubName) || clubName == "none" {
+			_ = ctx.Respond(helpers.GetDefaultResponse("That's not your club, sorry, can't help you.", true, ctx))
+		}
+
+		msg := getKitAssignments(clubName)
+		_ = ctx.Respond(helpers.GetDefaultResponse(msg, true, ctx))
+	}),
+}
+
 func requestAssignment(ctx *disgolf.Ctx, sass bool) {
 	thisChan, err := ctx.Channel(ctx.Interaction.ChannelID)
 	check.Err(err)
@@ -109,4 +187,55 @@ func getAssignmentMessage(name string, sass bool) (assignMsg string) {
 		assignMsg = sb.String()
 	}
 	return
+}
+
+func canListAssignments(ctx *disgolf.Ctx, club string) bool {
+	if helpers.IsDiscoUserInClub(ctx.Interaction.Member.User.Username, club) {
+		return true
+	}
+
+	officerRole := strings.ReplaceAll(club, " ", "") + " Officers"
+	officerRoleId, err := helpers.GetRoleId(ctx, officerRole)
+	if err != nil {
+		log.Errorw("error finding role ID from context", "role", officerRole, "error", err)
+		return false
+	}
+	if helpers.CheckroleMembership(ctx, officerRoleId) {
+		return true
+	}
+
+	return false
+}
+
+func getKitAssignments(clubName string) string {
+	var msg strings.Builder
+
+	clubRec, err := sheetDAO.GetClubByName(clubName)
+	if err != nil {
+		log.Warnw("could not find club in getKitAssignments", "club", clubName)
+		return "Oops. Had a problem finding your club :confounded:"
+	}
+
+	clubFilter := func(snail *sheetDAO.Snail) bool { return snail.Club == clubRec.ClubID }
+	leaderSort := func(snails []*sheetDAO.Snail) {
+		slices.SortStableFunc(snails,
+			func(a, b *sheetDAO.Snail) int { return b.Leadership - a.Leadership })
+	}
+
+	snails, err := sheetDAO.GetAllSnails(sheetDAO.SnailFilter(clubFilter), sheetDAO.SnailSort(leaderSort))
+	if err != nil {
+		log.Warnw("could not get snail list in getKitAssignments", "club", clubName)
+		return "Oops. Had a problem retrieving the list :confounded:"
+	}
+	if len(snails) < 1 {
+		log.Warnw("found zero snails in getKitAssignments", "club", clubName)
+		return "Oops. Had a problem retrieving the list :confounded:"
+	}
+
+	msg.WriteString(fmt.Sprintf("__Species War Kit Assignments for %s__\n", clubName))
+	for _, snail := range snails {
+		msg.WriteString(fmt.Sprintf("%d\t%s\t%s\n", snail.SWKitRank, snail.SWKit, snail.SnailName))
+	}
+
+	return msg.String()
 }
