@@ -234,7 +234,7 @@ func getKitAssignments(clubName string) string {
 
 	msg.WriteString(fmt.Sprintf("__Species War Kit Assignments for %s__\n", clubName))
 	for _, snail := range snails {
-		msg.WriteString(fmt.Sprintf("%d\t%s\t%s\n", snail.SWKitRank, snail.SWKit, snail.SnailName))
+		msg.WriteString(fmt.Sprintf("%d\t%s\t%s (Leadership: %d)\n", snail.SWKitRank, snail.SWKit, snail.SnailName, snail.Leadership))
 	}
 
 	return msg.String()
