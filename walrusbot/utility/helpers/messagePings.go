@@ -9,7 +9,7 @@ import (
 	"github.com/FedorLap2006/disgolf"
 )
 
-func AddPings(ctx *disgolf.Ctx, message string) string {
+func addPings(ctx *disgolf.Ctx, message string) string {
 	ret := message
 	r := regexp.MustCompile("<ping([^>]*)>")
 

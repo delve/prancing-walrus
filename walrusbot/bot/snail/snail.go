@@ -227,7 +227,13 @@ func updateSnail(ctx *disgolf.Ctx) error {
 		case "speciesessences":
 			snail.SpeciesWarEssences = int(option.IntValue())
 		case "totalpower":
-			// TODO: do some interpretation here!
+			value, err := helpers.DebreviateNumber(option.StringValue())
+			if err != nil {
+				_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("%s doesn't look like a valid number: %s", option.StringValue(), err), true, ctx))
+				return responded
+			}
+			// discard any remaining fraction, there shouldn't be any in this context anyway
+			snail.TotalPower = int(value)
 		case "art":
 			snail.Art = int(option.IntValue())
 		case "fth":
