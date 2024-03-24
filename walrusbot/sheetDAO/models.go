@@ -40,22 +40,33 @@ func Initialize(spreadsheetID string, saKey []byte) error {
 
 //go:generate sheetdb-modeler -type=Player -children=Snail -test=off
 
-// Snail is a struct of basic snail data
+// Player is a struct of basic player data
 type Player struct {
 	PlayerID int    `json:"playerID" db:"primarykey"`
 	DiscoId  string `json:"discoId" db:"unique"`
 }
 
+//go:generate sheetdb-modeler -type=Club -test=off
+
+// Club is a struct of basic club information
+type Club struct {
+	ClubID int    `json:"clubID" db:"primarykey"`
+	Name   string `json:"name" db:"unique"`
+}
+
 //go:generate sheetdb-modeler -type=Snail -parent=Player -test=off
 
-// SnailStat is a struct of snail statistics and is a child of Snail
+// Snail is a struct of snail statistics and is a child of Player
 type Snail struct {
 	PlayerID int `json:"playerID" db:"primarykey"`
 	SnailID  int `json:"SnailID" db:"primarykey"`
 	// unix epoch of last record update
-	Updated    int        `json:"updated"`
-	SnailName  string     `json:"snailName"`
-	Club       string     `json:"club" db:"allowempty"`
+	Updated   int    `json:"updated"`
+	SnailName string `json:"snailName"`
+	// Club is a foreign key to Club. this DAO doesn't know what FKs are tho :(
+	Club       int        `json:"club"`
+	SWKit      string     `json:"swKit" db:"allowempty"`
+	SWKitRank  int        `json:"swKitRank"`
 	Server     ServerName `json:"server"`
 	ServerNum  int        `json:"serverNum"`
 	Leadership int        `json:"leadership"`
@@ -90,6 +101,8 @@ func (s *Snail) AddThisSnail() error {
 		int(time.Now().Unix()),
 		s.SnailName,
 		s.Club,
+		s.SWKit,
+		s.SWKitRank,
 		ServerName(s.Server),
 		s.ServerNum,
 		s.Leadership,
@@ -120,6 +133,8 @@ func (s *Snail) UpdateThisSnail() error {
 		int(time.Now().Unix()),
 		s.SnailName,
 		s.Club,
+		s.SWKit,
+		s.SWKitRank,
 		ServerName(s.Server),
 		s.ServerNum,
 		s.Leadership,

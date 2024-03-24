@@ -159,7 +159,7 @@ func PlayerSort(sortFunc func(players []*Player)) func(query *PlayerQuery) *Play
 // If any options are specified, the result according to the specified option is returned.
 // If there are no player to return, this function returns an nil array.
 // If the sort option is not specified, the order of players is random.
-func GetPlayers(opts ...PlayerQueryOption) ([]*Player, error) {
+func GetAllPlayers(opts ...PlayerQueryOption) ([]*Player, error) {
 	query := &PlayerQuery{}
 	for _, opt := range opts {
 		query = opt(query)
@@ -333,6 +333,8 @@ func (m *Player) _asyncDelete(snails []*Snail) error {
 				v.Updated,
 				v.SnailName,
 				v.Club,
+				v.SWKit,
+				v.SWKitRank,
 				v.Server.String(),
 				v.ServerNum,
 				v.Leadership,

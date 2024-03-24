@@ -1,4 +1,4 @@
-containerVersion = v0.07
+containerVersion = v0.09
 debugVersion = test
 
 MODELS_DIR := ./walrusbot/sheetDAO
@@ -66,7 +66,7 @@ $(MODEL_FILES): $(MODELS_GO)
 
 $(MODELS_GO): /workspace/go/bin/sheetdb-modeler
 
-/workspace/go/bin/sheetdb-modeler: # or @v0.1.0
+/workspace/go/bin/sheetdb-modeler: # or @v0.2.0
 	go install github.com/delve/sheetdb/tools/sheetdb-modeler@latest
 
 updateSheetdbVersion:
