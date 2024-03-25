@@ -46,6 +46,8 @@ var Snail = &disgolf.Command{
 				Required:    true,
 			}},
 			Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
+				thisChan, _ := ctx.Channel(ctx.Interaction.ChannelID)
+				log.Infow("In Handler", "command", "snail", "subcommand", "add", "channel", thisChan.Name, "user", ctx.Interaction.Member.User.Username, "options", ctx.Options)
 				if match, err := regexp.MatchString("^[0-9a-zA-Z_-]+$", ctx.Options["name"].StringValue()); !match || err != nil {
 					_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("%s doesn't look like a valid name. Just what stunt are you trying to pull here?\nOnly allowing letters, numbers, _, and -. Because I couldn't find a list of characters the game consideres valid.", ctx.Options["name"].StringValue()), true, ctx))
 					return
@@ -82,6 +84,8 @@ var Snail = &disgolf.Command{
 			Name:        "list",
 			Description: "Get a list of all your snails.",
 			Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
+				thisChan, _ := ctx.Channel(ctx.Interaction.ChannelID)
+				log.Infow("In Handler", "command", "snail", "subcommand", "list", "channel", thisChan.Name, "user", ctx.Interaction.Member.User.Username)
 				snails, err := getSnails(ctx)
 				if _, isErr := err.(alreadyResponded); isErr { // response has already been sent
 					return
@@ -113,6 +117,8 @@ var Snail = &disgolf.Command{
 				Required:    true,
 			}},
 			Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
+				thisChan, _ := ctx.Channel(ctx.Interaction.ChannelID)
+				log.Infow("In Handler", "command", "snail", "subcommand", "show", "channel", thisChan.Name, "user", ctx.Interaction.Member.User.Username, "options", ctx.Options)
 				snail, err := getSnail(ctx, ctx.Options["name"].StringValue())
 				if err != nil { // logged and responded in function
 					return
@@ -136,6 +142,8 @@ var Snail = &disgolf.Command{
 			Description: "Update your snails' stats.",
 			Options:     snailStatsOptions,
 			Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
+				thisChan, _ := ctx.Channel(ctx.Interaction.ChannelID)
+				log.Infow("In Handler", "command", "snail", "subcommand", "update", "channel", thisChan.Name, "user", ctx.Interaction.Member.User.Username, "options", ctx.Options)
 				err := updateSnail(ctx)
 				if _, isErr := err.(alreadyResponded); isErr { // response has already been sent
 					return
