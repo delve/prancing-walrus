@@ -144,7 +144,25 @@ var Snail = &disgolf.Command{
 			Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
 				thisChan, _ := ctx.Channel(ctx.Interaction.ChannelID)
 				log.Infow("In Handler", "command", "snail", "subcommand", "update", "channel", thisChan.Name, "user", ctx.Interaction.Member.User.Username, "options", ctx.Options)
-				err := updateSnail(ctx)
+				player, err := sheetDAO.GetPlayerByDiscoId(ctx.Interaction.Member.User.Username)
+				if err != nil {
+					log.Errorw("In Handler", "command", "snail", "subcommand", "update", "channel", thisChan.Name, "user", ctx.Interaction.Member.User.Username, "options", ctx.Options, "error", err)
+					_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, there was a problem updating your snail. Paging <pingCaretakerRole> to review the log", true, ctx))
+					return
+				}
+				snails, _ := player.GetSnails()
+				found := false
+				for _, snail := range snails {
+					if snail.SnailName == ctx.Options["name"].StringValue() {
+						found = true
+						break
+					}
+				}
+				if !found {
+					_ = ctx.Respond(helpers.GetDefaultResponse("What are you tryna pull? That's not your snail. Go mess with someone that doesn't have meter long tusks and weigh 1000 kilograms. Before I get grumpy.", true, ctx))
+					return
+				}
+				err = updateSnail(ctx)
 				if _, isErr := err.(alreadyResponded); isErr { // response has already been sent
 					return
 				}
@@ -227,66 +245,217 @@ func updateSnail(ctx *disgolf.Ctx) error {
 	if err != nil {
 		return err
 	}
+	responses := []string{}
+	stat := ""
 	for key, option := range ctx.Options {
 		switch key {
 		case "name":
 			// do nothing with name
 		case "leadership":
+			if int(option.IntValue()) < 0 {
+				responses = append(responses, fmt.Sprintf("%d doesn't look right. Are you sure that's your Leadership?", option.IntValue()))
+				break
+			}
 			snail.Leadership = int(option.IntValue())
 		case "speciesessences":
+			stat = "SW essences"
+			if int(option.IntValue()) < 0 {
+				responses = append(responses, fmt.Sprintf("%d? Are you sure that's how many %s you have?", option.IntValue(), stat))
+				break
+			}
 			snail.SpeciesWarEssences = int(option.IntValue())
 		case "totalpower":
+			stat = "total power"
 			value, err := helpers.DebreviateNumber(option.StringValue())
 			if err != nil {
-				_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("%s doesn't look like a valid number: %s", option.StringValue(), err), true, ctx))
-				return responded
+				responses = append(responses, fmt.Sprintf("Your %s (%s) doesn't look like a valid number: %s", stat, option.StringValue(), err))
+				break
+			}
+			if value < 0 {
+				responses = append(responses, fmt.Sprintf("%d? Are you sure that's your %s?", int(value), stat))
+				break
 			}
 			// discard any remaining fraction, there shouldn't be any in this context anyway
 			snail.TotalPower = int(value)
 		case "art":
-			snail.Art = int(option.IntValue())
+			stat = "art"
+			value, err := helpers.DebreviateNumber(option.StringValue())
+			if err != nil {
+				responses = append(responses, fmt.Sprintf("Your %s (%s) doesn't look like a valid number: %s", stat, option.StringValue(), err))
+				break
+			}
+			if value < 0 {
+				responses = append(responses, fmt.Sprintf("%d? Are you sure that's your %s?", int(value), stat))
+				break
+			}
+			// discard any remaining fraction, there shouldn't be any in this context anyway
+			snail.Art = int(value)
 		case "fth":
-			snail.Fth = int(option.IntValue())
+			stat = "faith"
+			value, err := helpers.DebreviateNumber(option.StringValue())
+			if err != nil {
+				responses = append(responses, fmt.Sprintf("Your %s (%s) doesn't look like a valid number: %s", stat, option.StringValue(), err))
+				break
+			}
+			if value < 0 {
+				responses = append(responses, fmt.Sprintf("%d? Are you sure that's your %s?", int(value), stat))
+				break
+			}
+			// discard any remaining fraction, there shouldn't be any in this context anyway
+			snail.Fth = int(value)
 		case "fame":
-			snail.Fame = int(option.IntValue())
+			stat = "fame"
+			value, err := helpers.DebreviateNumber(option.StringValue())
+			if err != nil {
+				responses = append(responses, fmt.Sprintf("Your %s (%s) doesn't look like a valid number: %s", stat, option.StringValue(), err))
+				break
+			}
+			if value < 0 {
+				responses = append(responses, fmt.Sprintf("%d? Are you sure that's your %s?", int(value), stat))
+				break
+			}
+			// discard any remaining fraction, there shouldn't be any in this context anyway
+			snail.Fame = int(value)
 		case "civ":
-			snail.Civ = int(option.IntValue())
+			stat = "civ"
+			value, err := helpers.DebreviateNumber(option.StringValue())
+			if err != nil {
+				responses = append(responses, fmt.Sprintf("Your %s (%s) doesn't look like a valid number: %s", stat, option.StringValue(), err))
+				break
+			}
+			if value < 0 {
+				responses = append(responses, fmt.Sprintf("%d? Are you sure that's your %s?", int(value), stat))
+				break
+			}
+			// discard any remaining fraction, there shouldn't be any in this context anyway
+			snail.Civ = int(value)
 		case "tech":
-			snail.Tech = int(option.IntValue())
+			stat = "tech"
+			value, err := helpers.DebreviateNumber(option.StringValue())
+			if err != nil {
+				responses = append(responses, fmt.Sprintf("Your %s (%s) doesn't look like a valid number: %s", stat, option.StringValue(), err))
+				break
+			}
+			if value < 0 {
+				responses = append(responses, fmt.Sprintf("%d? Are you sure that's your %s?", int(value), stat))
+				break
+			}
+			// discard any remaining fraction, there shouldn't be any in this context anyway
+			snail.Tech = int(value)
 		case "hp":
-			snail.Hp = int(option.IntValue())
+			stat = "HP"
+			value, err := helpers.DebreviateNumber(option.StringValue())
+			if err != nil {
+				responses = append(responses, fmt.Sprintf("Your %s (%s) doesn't look like a valid number: %s", stat, option.StringValue(), err))
+				break
+			}
+			if value < 0 {
+				responses = append(responses, fmt.Sprintf("%d? Are you sure that's your %s?", int(value), stat))
+				break
+			}
+			// discard any remaining fraction, there shouldn't be any in this context anyway
+			snail.Hp = int(value)
 		case "atk":
-			snail.Atk = int(option.IntValue())
+			stat = "attack"
+			value, err := helpers.DebreviateNumber(option.StringValue())
+			if err != nil {
+				responses = append(responses, fmt.Sprintf("Your %s (%s) doesn't look like a valid number: %s", stat, option.StringValue(), err))
+				break
+			}
+			if value < 0 {
+				responses = append(responses, fmt.Sprintf("%d? Are you sure that's your %s?", int(value), stat))
+				break
+			}
+			// discard any remaining fraction, there shouldn't be any in this context anyway
+			snail.Atk = int(value)
 		case "rush":
-			snail.Rush = int(option.IntValue())
+			stat = "rush"
+			value, err := helpers.DebreviateNumber(option.StringValue())
+			if err != nil {
+				responses = append(responses, fmt.Sprintf("Your %s (%s) doesn't look like a valid number: %s", stat, option.StringValue(), err))
+				break
+			}
+			if value < 0 {
+				responses = append(responses, fmt.Sprintf("%d? Are you sure that's your %s?", int(value), stat))
+				break
+			}
+			// discard any remaining fraction, there shouldn't be any in this context anyway
+			snail.Rush = int(value)
 		case "def":
-			snail.Def = int(option.IntValue())
+			stat = "defense"
+			value, err := helpers.DebreviateNumber(option.StringValue())
+			if err != nil {
+				responses = append(responses, fmt.Sprintf("Your %s (%s) doesn't look like a valid number: %s", stat, option.StringValue(), err))
+				break
+			}
+			if value < 0 {
+				responses = append(responses, fmt.Sprintf("%d? Are you sure that's your %s?", int(value), stat))
+				break
+			}
+			// discard any remaining fraction, there shouldn't be any in this context anyway
+			snail.Def = int(value)
 		case "zombie":
+			stat = "zombie form tier"
+			if int(option.IntValue()) < 0 {
+				responses = append(responses, fmt.Sprintf("%d? Are you sure that's your %s?", option.IntValue(), stat))
+				break
+			}
 			snail.ZombieForm = int(option.IntValue())
 		case "demon":
+			stat = "demon form tier"
+			if int(option.IntValue()) < 0 {
+				responses = append(responses, fmt.Sprintf("%d? Are you sure that's your %s?", option.IntValue(), stat))
+				break
+			}
 			snail.DemonForm = int(option.IntValue())
 		case "angel":
+			stat = "angel form tier"
+			if int(option.IntValue()) < 0 {
+				responses = append(responses, fmt.Sprintf("%d? Are you sure that's your %s?", option.IntValue(), stat))
+				break
+			}
 			snail.AngelForm = int(option.IntValue())
 		case "mutant":
+			stat = "mutant form tier"
+			if int(option.IntValue()) < 0 {
+				responses = append(responses, fmt.Sprintf("%d? Are you sure that's your %s?", option.IntValue(), stat))
+				break
+			}
 			snail.MutantForm = int(option.IntValue())
 		case "mecha":
+			stat = "mecha form tier"
+			if int(option.IntValue()) < 0 {
+				responses = append(responses, fmt.Sprintf("%d? Are you sure that's your %s?", option.IntValue(), stat))
+				break
+			}
 			snail.MechaForm = int(option.IntValue())
 		case "dragon":
+			stat = "dragon form tier"
+			if int(option.IntValue()) < 0 {
+				responses = append(responses, fmt.Sprintf("%d? Are you sure that's your %s?", option.IntValue(), stat))
+				break
+			}
 			snail.DragonForm = int(option.IntValue())
+
 		case "newname":
 			//lint:ignore SA6000 looping over a map, this only triggers once
 			if match, err := regexp.MatchString("^[0-9a-zA-Z_-]+$", option.StringValue()); !match || err != nil {
-				_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("%s doesn't look like a valid name. Just what stunt are you trying to pull here?\nOnly allowing letters, numbers, _, and -. Because I couldn't find a list of characters the game considers valid.", option.StringValue()), true, ctx))
-				return responded
+				responses = append(responses, fmt.Sprintf("%s doesn't look like a valid name. Just what stunt are you trying to pull here?\nI'm allowing letters, numbers, _, and -. Because I couldn't find a list of characters the game considers valid.", option.StringValue()))
+				break
 			}
 			sn, _ := getSnail(ctx, option.StringValue())
 			if sn != nil {
-				_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("Sorry, you already have a snail named %s so I can't perform your update. You can use `/snail list` to see all your snails.", option.StringValue()), true, ctx))
-				return responded
+				responses = append(responses, fmt.Sprintf("Sorry, you already have a snail named %s. I can't use that name again. You can use `/snail list` to see all your snails.", option.StringValue()))
+				break
 			}
 			snail.SnailName = option.StringValue()
 		}
 	}
+	if len(responses) > 0 {
+		_ = ctx.Respond(helpers.GetDefaultResponse(strings.Join(responses, "\n"), true, ctx))
+		return responded
+	}
+
 	err = snail.UpdateThisSnail()
 	if err != nil {
 		log.Errorw("error updating snail", "err", err, "snail", snail, "changes", ctx.Options)
@@ -325,76 +494,58 @@ var snailStatsOptions = []*discordgo.ApplicationCommandOption{
 		Required:    false,
 	},
 	{
-		Type:        discordgo.ApplicationCommandOptionInteger,
+		Type:        discordgo.ApplicationCommandOptionString,
 		Name:        "art",
 		Description: "Art",
-		MinValue:    &integerOptionZeroValue,
-		// MaxValue:    10,
-		Required: false,
+		Required:    false,
 	},
 	{
-		Type:        discordgo.ApplicationCommandOptionInteger,
+		Type:        discordgo.ApplicationCommandOptionString,
 		Name:        "fth",
 		Description: "Faith",
-		MinValue:    &integerOptionZeroValue,
-		// MaxValue:    10,
-		Required: false,
+		Required:    false,
 	},
 	{
-		Type:        discordgo.ApplicationCommandOptionInteger,
+		Type:        discordgo.ApplicationCommandOptionString,
 		Name:        "fame",
 		Description: "Fame",
-		MinValue:    &integerOptionZeroValue,
-		// MaxValue:    10,
-		Required: false,
+		Required:    false,
 	},
 	{
-		Type:        discordgo.ApplicationCommandOptionInteger,
+		Type:        discordgo.ApplicationCommandOptionString,
 		Name:        "civ",
 		Description: "Civ",
-		MinValue:    &integerOptionZeroValue,
-		// MaxValue:    10,
-		Required: false,
+		Required:    false,
 	},
 	{
-		Type:        discordgo.ApplicationCommandOptionInteger,
+		Type:        discordgo.ApplicationCommandOptionString,
 		Name:        "tech",
 		Description: "Tech",
-		MinValue:    &integerOptionZeroValue,
-		// MaxValue:    10,
-		Required: false,
+		Required:    false,
 	},
 	{
-		Type:        discordgo.ApplicationCommandOptionInteger,
+		Type:        discordgo.ApplicationCommandOptionString,
 		Name:        "hp",
 		Description: "Hit points",
-		MinValue:    &integerOptionZeroValue,
-		// MaxValue:    10,
-		Required: false,
+		Required:    false,
 	},
 	{
-		Type:        discordgo.ApplicationCommandOptionInteger,
+		Type:        discordgo.ApplicationCommandOptionString,
 		Name:        "atk",
 		Description: "Attack",
-		MinValue:    &integerOptionZeroValue,
-		// MaxValue:    10,
-		Required: false,
+		Required:    false,
 	},
 	{
-		Type:        discordgo.ApplicationCommandOptionInteger,
+		Type:        discordgo.ApplicationCommandOptionString,
 		Name:        "rush",
 		Description: "Rush",
-		MinValue:    &integerOptionZeroValue,
-		// MaxValue:    10,
-		Required: false,
+		Required:    false,
 	},
 	{
-		Type:        discordgo.ApplicationCommandOptionInteger,
+		Type:        discordgo.ApplicationCommandOptionString,
 		Name:        "def",
 		Description: "Defense",
-		MinValue:    &integerOptionZeroValue,
-		// MaxValue:    10,
-		Required: false,
+		Required:    false,
 	},
 	{
 		Type:        discordgo.ApplicationCommandOptionInteger,
