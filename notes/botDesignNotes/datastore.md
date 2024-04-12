@@ -8,7 +8,7 @@
 # decisions
 data storage must be free
 
-feels like using BigQuery is just too much more cumbersome. have to be able to sync back and forth (so mgrs can crunch, review, update numbers)
+feels like using BigQuery is just too much more cumbersome. have to be able to sync back and forth (so mgrs can crunch & review numbers)
 
 would prefer a single data store (making bigquery sync even more important, and problematic)
 
@@ -21,12 +21,7 @@ HOWEVER, if extended to additional clubs there's less concern over access
 
 could look into dumping CSV files for import?
 
-# open questions
-NONE! :D
-
 # notes
-testing w/ sheet in noreg account to mimic current arrangement.
-
 found a sheets DAO module, the API module provided by google is ass. DAO module had to be forked (looks like someone's old abandonded PoC project) and adjusted to allow more auth flexibility. it's now one of my repos.
 
 # SA keys
@@ -34,7 +29,7 @@ This provides Go code that supposedly generates a key for the SA (auth provided 
 
 https://cloud.google.com/iam/docs/keys-create-delete#iam-service-account-keys-create-go
 
-SA key is generated dynamically by the bot on startup. deletion is deferred, and does not occur in some shutdown scenarios, EG terminating an interactive debug session. should consider dynamic cleanup at startup.
+SA key is generated dynamically by the bot on startup. deletion is deferred, and does not occur in some shutdown scenarios, EG terminating an interactive debug session. automatically deletes all SA keys at startup. if we start sharding this will be problematic
 
 Handling keys dynamically via CLI is no longer necessary but is kept here for convenient reference:
 ```
