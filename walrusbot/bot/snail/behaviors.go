@@ -52,6 +52,9 @@ func snailList(ctx *disgolf.Ctx) {
 	if _, isErr := err.(alreadyResponded); isErr { // response has already been sent
 		return
 	}
+	if snails == nil{
+		_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, I don't know any of your snails. Maybe you should `/snail add` one.", true, ctx))
+	}
 
 	var sb strings.Builder
 	sb.WriteString(fmt.Sprintf("Hi %s! These are the snails I know about.\n", ctx.Interaction.Member.User.Username))
@@ -127,8 +130,7 @@ func getSnails(ctx *disgolf.Ctx) ([]*sheetDAO.Snail, error) {
 		return nil, responded
 	}
 	if len(snails) == 0 {
-		_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, I don't know any of your snails. Maybe you should `/snail add` one.", true, ctx))
-		return nil, responded
+		return nil, nil
 	}
 
 	return snails, nil
@@ -170,6 +172,9 @@ func updateThisSnail(ctx *disgolf.Ctx) error {
 	snail, err := getSnail(ctx, ctx.Options["name"].StringValue())
 	if err != nil {
 		return err
+	}
+	if snail == nil {
+		_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("Sorry, looks like you haven't told me about %[1]s. Maybe you could `/snail add name:%[1]s` them.", ctx.Options["name"].StringValue()), true, ctx))
 	}
 	responses := []string{}
 	stat := ""
