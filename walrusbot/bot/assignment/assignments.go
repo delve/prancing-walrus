@@ -51,7 +51,7 @@ var dataTabs = []rosterTab{
 		key:         0},
 }
 
-func CalculateAssignments() error {
+func calculateAssignments() error {
 	log.Infow("calculating all kit assignments")
 	errs := []string{}
 
@@ -136,6 +136,7 @@ func calculateClubAssignments(club int, clubname string) error {
 	return nil
 }
 
+// TODO: this should be private and part of an init function instead of called directly from main
 func CacheAssignments() {
 	log.Infow("Caching assignment data")
 

@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"fmt"
 	"strings"
 	"walrusbot/utility/log"
 
@@ -43,4 +44,21 @@ func GetDefaultResponse(message string, ephemeral bool, ctx *disgolf.Ctx) *disco
 		}
 	}
 
+}
+
+var handlerRecovery = func(ctx *disgolf.Ctx) {
+	if r := recover(); r != nil {
+		log.Errorw("Recovered panic in handler", "handler", ctx.Caller.Name, "user", ctx.Interaction.Member.User.Username, "error", r, "options", ctx.Options)
+	}
+}
+
+func HandlerWrapper(parentCmd string, ctx *disgolf.Ctx, behavior func(*disgolf.Ctx)) {
+	defer handlerRecovery(ctx)
+	thisChan, _ := ctx.Channel(ctx.Interaction.ChannelID)
+	command := ctx.Caller.Name
+	if len(parentCmd) > 0 {
+		command = fmt.Sprintf("%s %s", parentCmd, command)
+	}
+	log.Infow("In Handler", "command", command, "channel", thisChan.Name, "user", ctx.Interaction.Member.User.Username)
+	behavior(ctx)
 }

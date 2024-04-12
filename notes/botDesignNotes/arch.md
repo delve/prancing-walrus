@@ -1,0 +1,1 @@
+needs proper level separation. MVC, MVVM, or something. model/DB code is too entwined with the Disco package APIs
