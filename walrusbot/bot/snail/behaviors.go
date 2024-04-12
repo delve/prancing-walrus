@@ -75,6 +75,11 @@ func snailShow(ctx *disgolf.Ctx) {
 func snailUpdate(ctx *disgolf.Ctx) {
 	thisChan, _ := ctx.Channel(ctx.Interaction.ChannelID)
 	log.Infow("In Handler", "command", "snail", "subcommand", "update", "channel", thisChan.Name, "user", ctx.Interaction.Member.User.Username, "options", ctx.Options)
+	//TODO: handle errors about the player not existing. currently they come out looking like:
+	/*
+		"error":"Model 'Player' not found"
+		in the log. which is obviously confusing and not what the function is supposed to return :(
+	*/
 	player, err := sheetDAO.GetPlayerByDiscoId(ctx.Interaction.Member.User.Username)
 	if err != nil {
 		log.Errorw("In Handler", "command", "snail", "subcommand", "update", "channel", thisChan.Name, "user", ctx.Interaction.Member.User.Username, "options", ctx.Options, "error", err)
