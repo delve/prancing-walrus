@@ -167,6 +167,9 @@ func CacheAssignments() {
 		}
 
 		for _, playerRecord := range playerData.Values {
+			if len(playerRecord) < 1 {
+				continue
+			}
 			assignments[playerRecord[0].(string)] = makeAssignmentRecord(playerRecord, headers)
 		}
 	}
