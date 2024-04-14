@@ -122,7 +122,7 @@ var snailStatsOptions = []*discordgo.ApplicationCommandOption{
 	},
 	{
 		Type:        discordgo.ApplicationCommandOptionInteger,
-		Name:        "speciesessences",
+		Name:        "sw_essences",
 		Description: "Species war essence count",
 		MinValue:    &integerOptionZeroValue,
 		// MaxValue:    10,
