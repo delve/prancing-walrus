@@ -150,10 +150,14 @@ func getSnail(ctx *disgolf.Ctx, name string) (*sheetDAO.Snail, error) {
 }
 
 func formatSnailStats(snail *sheetDAO.Snail) string {
-	club, _ := sheetDAO.GetClub(snail.Club)
+	var club *sheetDAO.Club
+	if snail.Club > 0 {
+		club, _ = sheetDAO.GetClub(snail.Club)
+	} else {
+		club, _ = sheetDAO.GetClub(1)
+	}
 	var sb strings.Builder
 	sb.WriteString(fmt.Sprintf("This is everything I know about %s.\n", snail.SnailName))
-	// TODO: something about this line can throw a nil pointer error. find and fix it! looks like it's related to server being nil on new entries? but might be due to club = 0
 	sb.WriteString(fmt.Sprintf("Server: %s %d\tClub: %s\n", snail.Server, snail.ServerNum, club.Name))
 	sb.WriteString(fmt.Sprintf("Leadership: %d\tHoarded SW Essences: %d\n", snail.Leadership, snail.SpeciesWarEssences))
 	sb.WriteString(fmt.Sprintf("Total Power: %d\n", snail.TotalPower))
