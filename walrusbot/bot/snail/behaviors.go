@@ -189,7 +189,7 @@ func updateThisSnail(ctx *disgolf.Ctx) error {
 				break
 			}
 			snail.Leadership = int(option.IntValue())
-		case "speciesessences":
+		case "sw_essences":
 			stat = "SW essences"
 			if int(option.IntValue()) < 0 {
 				responses = append(responses, fmt.Sprintf("%d? Are you sure that's how many %s you have?", option.IntValue(), stat))
