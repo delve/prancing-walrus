@@ -7,12 +7,6 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-type alreadyResponded string
-
-func (e alreadyResponded) Error() string {
-	return "already responded"
-}
-
 var listMembers = func(ctx *disgolf.Ctx) {
 	helpers.HandlerWrapper("club", ctx, memberList)
 }
