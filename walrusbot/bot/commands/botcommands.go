@@ -2,6 +2,7 @@ package botcommands
 
 import (
 	"walrusbot/bot/assignment"
+	"walrusbot/bot/club"
 	"walrusbot/bot/snail"
 
 	"github.com/FedorLap2006/disgolf"
@@ -16,6 +17,7 @@ var Commands = []*disgolf.Command{
 	assignment.CalculateAssignment,
 	assignment.ViewAssignments,
 	snail.Snail,
+	club.Club,
 }
 
 func Load(bot *disgolf.Bot) {

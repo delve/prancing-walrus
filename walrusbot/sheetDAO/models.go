@@ -52,6 +52,7 @@ type Player struct {
 type Club struct {
 	ClubID int    `json:"clubID" db:"primarykey"`
 	Name   string `json:"name" db:"unique"`
+	Abrv   string `json:"abrv" db:"unique"`
 }
 
 //go:generate sheetdb-modeler -type=Snail -parent=Player -test=off
