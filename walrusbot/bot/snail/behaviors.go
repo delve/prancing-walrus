@@ -76,19 +76,19 @@ func snailShow(ctx *disgolf.Ctx) {
 }
 
 func snailUpdate(ctx *disgolf.Ctx) {
-	thisChan, _ := ctx.Channel(ctx.Interaction.ChannelID)
-	log.Infow("In Handler", "command", "snail", "subcommand", "update", "channel", thisChan.Name, "user", ctx.Interaction.Member.User.Username, "options", ctx.Options)
-	//TODO: handle errors about the player not existing. currently they come out looking like:
-	/*
-		"error":"Model 'Player' not found"
-		in the log. which is obviously confusing and not what the function is supposed to return :(
-	*/
 	player, err := sheetDAO.GetPlayerByDiscoId(ctx.Interaction.Member.User.Username)
+	if _, isNotFound := err.(*sheetdb.NotFoundError); isNotFound { // Counld't find the player
+		msg := fmt.Sprintf("Sorry, looks like we haven't met yet. Please use `/snail add name:%s` first so we can get to know each other.", ctx.Options["name"].StringValue())
+		_ = ctx.Respond(helpers.GetDefaultResponse(msg, true, ctx))
+		return
+	}
 	if err != nil {
+		thisChan, _ := ctx.Channel(ctx.Interaction.ChannelID)
 		log.Errorw("In Handler", "command", "snail", "subcommand", "update", "channel", thisChan.Name, "user", ctx.Interaction.Member.User.Username, "options", ctx.Options, "error", err)
 		_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, there was a problem updating your snail. Paging <pingCaretakerRole> to review the log", true, ctx))
 		return
 	}
+
 	snails, _ := player.GetSnails()
 	found := false
 	for _, snail := range snails {
