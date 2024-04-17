@@ -15,7 +15,7 @@ import (
 
 func snailAdd(ctx *disgolf.Ctx) {
 	if match, err := regexp.MatchString("^[0-9a-zA-Z_-]+$", ctx.Options["name"].StringValue()); !match || err != nil {
-		_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("%s doesn't look like a valid name. Just what stunt are you trying to pull here?\nOnly allowing letters, numbers, _, and -. Because I couldn't find a list of characters the game consideres valid.", ctx.Options["name"].StringValue()), true, ctx))
+		_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("%s doesn't look like a valid name. Just what stunt are you trying to pull here?\nOnly allowing letters, numbers, _, and -. Because I couldn't find a list of characters the game considers valid.", ctx.Options["name"].StringValue()), true, ctx))
 		return
 	}
 	player, err := sheetDAO.GetPlayerByDiscoId(ctx.Interaction.Member.User.Username)

@@ -13,8 +13,6 @@ func (e alreadyResponded) Error() string {
 	return "already responded"
 }
 
-var integerOptionZeroValue = 0.0
-
 var addSnail = func(ctx *disgolf.Ctx) {
 	helpers.HandlerWrapper("snail", ctx, snailAdd)
 }
@@ -116,7 +114,7 @@ var snailStatsOptions = []*discordgo.ApplicationCommandOption{
 		Type:        discordgo.ApplicationCommandOptionInteger,
 		Name:        "leadership",
 		Description: "Leadership",
-		MinValue:    &integerOptionZeroValue,
+		MinValue:    &helpers.IntegerOptionZeroValue,
 		// MaxValue:    10,
 		Required: false,
 	},
@@ -124,7 +122,7 @@ var snailStatsOptions = []*discordgo.ApplicationCommandOption{
 		Type:        discordgo.ApplicationCommandOptionInteger,
 		Name:        "sw_essences",
 		Description: "Species war essence count",
-		MinValue:    &integerOptionZeroValue,
+		MinValue:    &helpers.IntegerOptionZeroValue,
 		// MaxValue:    10,
 		Required: false,
 	},
@@ -192,7 +190,7 @@ var snailStatsOptions = []*discordgo.ApplicationCommandOption{
 		Type:        discordgo.ApplicationCommandOptionInteger,
 		Name:        "zombie",
 		Description: "Zombie form tier",
-		MinValue:    &integerOptionZeroValue,
+		MinValue:    &helpers.IntegerOptionZeroValue,
 		// MaxValue:    10,
 		Required: false,
 	},
@@ -200,7 +198,7 @@ var snailStatsOptions = []*discordgo.ApplicationCommandOption{
 		Type:        discordgo.ApplicationCommandOptionInteger,
 		Name:        "demon",
 		Description: "Demon form tier",
-		MinValue:    &integerOptionZeroValue,
+		MinValue:    &helpers.IntegerOptionZeroValue,
 		// MaxValue:    10,
 		Required: false,
 	},
@@ -208,7 +206,7 @@ var snailStatsOptions = []*discordgo.ApplicationCommandOption{
 		Type:        discordgo.ApplicationCommandOptionInteger,
 		Name:        "angel",
 		Description: "Angel form tier",
-		MinValue:    &integerOptionZeroValue,
+		MinValue:    &helpers.IntegerOptionZeroValue,
 		// MaxValue:    10,
 		Required: false,
 	},
@@ -216,7 +214,7 @@ var snailStatsOptions = []*discordgo.ApplicationCommandOption{
 		Type:        discordgo.ApplicationCommandOptionInteger,
 		Name:        "mutant",
 		Description: "Mutant form tier",
-		MinValue:    &integerOptionZeroValue,
+		MinValue:    &helpers.IntegerOptionZeroValue,
 		// MaxValue:    10,
 		Required: false,
 	},
@@ -224,7 +222,7 @@ var snailStatsOptions = []*discordgo.ApplicationCommandOption{
 		Type:        discordgo.ApplicationCommandOptionInteger,
 		Name:        "mecha",
 		Description: "Mecha form tier",
-		MinValue:    &integerOptionZeroValue,
+		MinValue:    &helpers.IntegerOptionZeroValue,
 		// MaxValue:    10,
 		Required: false,
 	},
@@ -232,7 +230,7 @@ var snailStatsOptions = []*discordgo.ApplicationCommandOption{
 		Type:        discordgo.ApplicationCommandOptionInteger,
 		Name:        "dragon",
 		Description: "Dragon form tier",
-		MinValue:    &integerOptionZeroValue,
+		MinValue:    &helpers.IntegerOptionZeroValue,
 		// MaxValue:    10,
 		Required: false,
 	},

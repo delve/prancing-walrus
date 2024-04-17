@@ -19,7 +19,7 @@ func assignmentRefresh(ctx *disgolf.Ctx) {
 		return
 	}
 
-	if helpers.CheckroleMembership(ctx, refreshRoleId) {
+	if helpers.CheckRoleMembership(ctx, refreshRoleId) {
 		_ = ctx.Respond(helpers.GetDefaultResponse("Refreshing assignment cache.", false, ctx))
 		CacheAssignments()
 		// TODO: figure out mutlipart interaction responses
@@ -48,7 +48,7 @@ func assignmentCalculate(ctx *disgolf.Ctx) {
 		return
 	}
 
-	if helpers.CheckroleMembership(ctx, refreshRoleId) {
+	if helpers.CheckRoleMembership(ctx, refreshRoleId) {
 		_ = ctx.Respond(helpers.GetDefaultResponse("Calculating kit assignments.", false, ctx))
 		calculateAssignments()
 		// TODO: figure out mutlipart interaction responses
@@ -59,6 +59,10 @@ func assignmentCalculate(ctx *disgolf.Ctx) {
 
 func assignmentView(ctx *disgolf.Ctx) {
 	thisChan, _ := ctx.Channel(ctx.Interaction.ChannelID)
+	if !slices.Contains(config.Values.WarPlanningChannels, thisChan.Name) {
+		_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("This command is only available from these channels %v", config.Values.WarPlanningChannels), true, ctx))
+	}
+
 	clubName := ""
 	val, ok := ctx.Options["club"]
 
@@ -77,17 +81,12 @@ func assignmentView(ctx *disgolf.Ctx) {
 		}
 	}
 
-	if !slices.Contains(config.Values.WarPlanningChannels, thisChan.Name) {
-		_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("This command is only available from these channels %v", config.Values.WarPlanningChannels), true, ctx))
-	}
-
 	if !canListAssignments(ctx, clubName) || clubName == "none" {
 		_ = ctx.Respond(helpers.GetDefaultResponse("That's not your club, sorry, can't help you.", true, ctx))
 	}
 
 	msg := getKitAssignments(clubName)
 	_ = ctx.Respond(helpers.GetDefaultResponse(msg, true, ctx))
-
 }
 
 func getAssignmentMessage(name string, sass bool) (assignMsg string) {
@@ -127,18 +126,7 @@ func canListAssignments(ctx *disgolf.Ctx, club string) bool {
 	if helpers.IsDiscoUserInClub(ctx.Interaction.Member.User.Username, club) {
 		return true
 	}
-
-	officerRole := strings.ReplaceAll(club, " ", "") + " Officers"
-	officerRoleId, err := helpers.GetRoleId(ctx, officerRole)
-	if err != nil {
-		log.Errorw("error finding role ID from context", "role", officerRole, "error", err)
-		return false
-	}
-	if helpers.CheckroleMembership(ctx, officerRoleId) {
-		return true
-	}
-
-	return false
+	return helpers.IsClubOfficer(ctx, club)
 }
 
 func getKitAssignments(clubName string) string {
