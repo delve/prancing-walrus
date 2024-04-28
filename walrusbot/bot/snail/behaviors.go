@@ -37,7 +37,7 @@ func snailAdd(ctx *disgolf.Ctx) {
 		return
 	}
 
-	snail, err = player.AddSnail(int(time.Now().Unix()), ctx.Options["name"].StringValue(), 0, "", 0, "", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+	snail, err = player.AddSnail(int(time.Now().Unix()), ctx.Options["name"].StringValue(), 1, "", 0, "", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 	if err != nil {
 		_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, there was a problem adding your snail. Paging <pingCaretakerRole> to review the log", true, ctx))
 		log.Errorw("Error adding snail in /snail add", "err", err)
