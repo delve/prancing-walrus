@@ -22,7 +22,7 @@ func assignmentRefresh(ctx *disgolf.Ctx) {
 	if helpers.CheckRoleMembership(ctx, refreshRoleId) {
 		_ = ctx.Respond(helpers.GetDefaultResponse("Refreshing assignment cache.", false, ctx))
 		CacheAssignments()
-		// TODO: figure out mutlipart interaction responses
+		// TODO: figure out multipart interaction responses
 	} else {
 		_ = ctx.Respond(helpers.GetDefaultResponse("This command is not available to this user in this context.", true, ctx))
 	}
@@ -50,8 +50,9 @@ func assignmentCalculate(ctx *disgolf.Ctx) {
 
 	if helpers.CheckRoleMembership(ctx, refreshRoleId) {
 		_ = ctx.Respond(helpers.GetDefaultResponse("Calculating kit assignments.", false, ctx))
-		calculateAssignments()
-		// TODO: figure out mutlipart interaction responses
+		_ = calculateAssignments()
+		// TODO: figure out multipart interaction responses
+		_ = updateAssignmentRoles(ctx)
 	} else {
 		_ = ctx.Respond(helpers.GetDefaultResponse("This command is not available to this user in this context.", true, ctx))
 	}

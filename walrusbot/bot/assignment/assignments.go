@@ -9,6 +9,7 @@ import (
 	"walrusbot/utility/config"
 	"walrusbot/utility/log"
 
+	"github.com/FedorLap2006/disgolf"
 	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
 )
@@ -133,6 +134,11 @@ func calculateClubAssignments(club int, clubname string) error {
 		snails[snailCursor].UpdateThisSnail()
 		// fmt.Printf("%s vanguard %d: %d - %s\n", clubname, i, snails[snailCursor].Leadership, snails[snailCursor].SnailName)
 	}
+	return nil
+}
+
+func updateAssignmentRoles(ctx *disgolf.Ctx) error {
+	
 	return nil
 }
 

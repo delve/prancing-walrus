@@ -70,6 +70,7 @@ func main() {
 		log.Fatalw("cannot publish commands", "err", err)
 	}
 	log.Infow("Bot is up!")
+	bot.Session.UpdateGameStatus(0, "Hey, That's My Fish!")
 
 	stchan := make(chan os.Signal, 1)
 	signal.Notify(stchan, syscall.SIGTERM, os.Interrupt, syscall.SIGSEGV)

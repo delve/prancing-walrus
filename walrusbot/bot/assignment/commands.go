@@ -50,14 +50,14 @@ var RefreshAssignment = &disgolf.Command{
 
 var CalculateAssignment = &disgolf.Command{
 	Name:        "calculateassignments",
-	Description: "Calculate the species war assignments based on player entered data",
+	Description: "Calculate the species war assignments based on snail stats in the database",
 	Type:        discordgo.ChatApplicationCommand,
 	Handler:     disgolf.HandlerFunc(calculateAssignment),
 }
 
 var ViewAssignments = &disgolf.Command{
 	Name:        "viewassignments",
-	Description: "Calculate the species war assignments based on player entered data",
+	Description: "List the assignments for a club",
 	Type:        discordgo.ChatApplicationCommand,
 	Options: []*discordgo.ApplicationCommandOption{{
 		Type:        discordgo.ApplicationCommandOptionString,

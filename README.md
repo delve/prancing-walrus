@@ -41,10 +41,6 @@ Scopes: Bot + applications.commands
 * * Use External emoji
 * * Use external stickers
 * * Add reactions
-* * Use slash comands
-* * Use external emoji
-* * Use external stickers
-* * Add reactions
 * * Use slash commands
 
 Invite URL for test app
