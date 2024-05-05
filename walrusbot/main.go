@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -41,7 +42,7 @@ func main() {
 	bot, err := disgolf.New(config.Values.Secrets.GetBotToken())
 	check.Err(err, "failed to init disgolf")
 
-	bot.Session.Debug = config.Values.Debug["discgoLogs"]
+	bot.Debug = config.Values.Debug["discgoLogs"]
 
 	// initial cache of assignment data
 	assignment.CacheAssignments()
@@ -52,6 +53,7 @@ func main() {
 		log.Infow("Bot session opened")
 	})
 	bot.AddHandler(bot.Router.HandleInteraction)
+	bot.Identify.Intents = discordgo.IntentsAll
 	// lets just not respond to DMs at all for now.
 	// bot.AddHandler(bot.Router.MakeMessageHandler(&disgolf.MessageHandlerConfig{
 	// 	// TODO: tidy this
@@ -70,7 +72,19 @@ func main() {
 		log.Fatalw("cannot publish commands", "err", err)
 	}
 	log.Infow("Bot is up!")
-	bot.Session.UpdateGameStatus(0, "Hey, That's My Fish!")
+	bot.UpdateGameStatus(0, "Hey, That's My Fish!")
+repeat:
+	guild, err := bot.Guild("775636532161019955")
+	if err != nil {
+		log.Fatalw("error on get guild", "err", err)
+	}
+	fmt.Printf("pre member count %d", guild.MemberCount)
+	err = bot.RequestGuildMembers("775636532161019955", "", 0, "", false)
+	if err != nil {
+		log.Fatalw("error on RequestGuildMembers", "err", err)
+	}
+	fmt.Printf("post member count %d", guild.MemberCount)
+	goto repeat
 
 	stchan := make(chan os.Signal, 1)
 	signal.Notify(stchan, syscall.SIGTERM, os.Interrupt, syscall.SIGSEGV)
