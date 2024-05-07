@@ -83,8 +83,7 @@ func snailUpdate(ctx *disgolf.Ctx) {
 		return
 	}
 	if err != nil {
-		thisChan, _ := ctx.Channel(ctx.Interaction.ChannelID)
-		log.Errorw("In Handler", "command", "snail", "subcommand", "update", "channel", thisChan.Name, "user", ctx.Interaction.Member.User.Username, "options", ctx.Options, "error", err)
+		log.Errorw("In Handler", "command", "snail", "subcommand", "update", "user", ctx.Interaction.Member.User.Username, "options", ctx.Options, "error", err)
 		_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, there was a problem updating your snail. Paging <pingCaretakerRole> to review the log", true, ctx))
 		return
 	}

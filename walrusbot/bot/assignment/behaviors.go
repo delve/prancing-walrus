@@ -30,15 +30,8 @@ func assignmentRefresh(ctx *disgolf.Ctx) {
 }
 
 func requestAssignment(ctx *disgolf.Ctx) {
-	thisChan, _ := ctx.Channel(ctx.Interaction.ChannelID)
-
 	sass := (ctx.Caller.Name == "myass")
-
-	if slices.Contains(config.Values.WarPlanningChannels, thisChan.Name) {
-		_ = ctx.Respond(helpers.GetDefaultResponse(getAssignmentMessage(ctx.Interaction.Member.User.Username, sass), true, ctx))
-	} else {
-		_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("This command is only available from these channels %v", config.Values.WarPlanningChannels), true, ctx))
-	}
+	_ = ctx.Respond(helpers.GetDefaultResponse(getAssignmentMessage(ctx.Interaction.Member.User.Username, sass), true, ctx))
 }
 
 func assignmentCalculate(ctx *disgolf.Ctx) {
@@ -58,11 +51,6 @@ func assignmentCalculate(ctx *disgolf.Ctx) {
 }
 
 func assignmentView(ctx *disgolf.Ctx) {
-	thisChan, _ := ctx.Channel(ctx.Interaction.ChannelID)
-	if !slices.Contains(config.Values.WarPlanningChannels, thisChan.Name) {
-		_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("This command is only available from these channels %v", config.Values.WarPlanningChannels), true, ctx))
-	}
-
 	clubName := ""
 	val, ok := ctx.Options["club"]
 

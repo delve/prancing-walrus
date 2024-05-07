@@ -57,7 +57,7 @@ func HandlerWrapper(parentCmd string, ctx *disgolf.Ctx, behavior func(*disgolf.C
 	thisChan, err := ctx.Channel(ctx.Interaction.ChannelID)
 	chanName := ""
 	if err != nil {
-		log.Errorw("Error retrieving channel from context in HandlerWrapper", "ctx", ctx)
+		log.Errorw("Error retrieving channel from context in HandlerWrapper", "ctx", ctx, "channelId", ctx.Interaction.ChannelID)
 		chanName = "N/A"
 	} else {
 		chanName = thisChan.Name
