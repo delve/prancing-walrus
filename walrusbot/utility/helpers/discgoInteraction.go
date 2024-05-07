@@ -54,11 +54,18 @@ var handlerRecovery = func(ctx *disgolf.Ctx) {
 
 func HandlerWrapper(parentCmd string, ctx *disgolf.Ctx, behavior func(*disgolf.Ctx)) {
 	defer handlerRecovery(ctx)
-	thisChan, _ := ctx.Channel(ctx.Interaction.ChannelID)
+	thisChan, err := ctx.Channel(ctx.Interaction.ChannelID)
+	chanName := ""
+	if err != nil {
+		log.Errorw("Error retrieving channel from context in HandlerWrapper", "ctx", ctx)
+		chanName = "N/A"
+	} else {
+		chanName = thisChan.Name
+	}
 	command := ctx.Caller.Name
 	if len(parentCmd) > 0 {
 		command = fmt.Sprintf("%s %s", parentCmd, command)
 	}
-	log.Infow("In Handler", "command", command, "channel", thisChan.Name, "user", ctx.Interaction.Member.User.Username)
+	log.Infow("In Handler", "command", command, "channel", chanName, "user", ctx.Interaction.Member.User.Username)
 	behavior(ctx)
 }
