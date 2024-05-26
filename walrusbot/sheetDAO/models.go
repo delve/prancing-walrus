@@ -65,36 +65,30 @@ type Snail struct {
 	Updated   int    `json:"updated"`
 	SnailName string `json:"snailName"`
 	// Club is a foreign key to Club. this DAO doesn't know what FKs are tho :(
-	Club       int        `json:"club"`
-	SWKit      string     `json:"swKit" db:"allowempty"`
-	SWKitRank  int        `json:"swKitRank"`
-	Server     ServerName `json:"server"`
-	ServerNum  int        `json:"serverNum"`
-	Leadership int        `json:"leadership"`
-	Art        int        `json:"art"`
-	Fth        int        `json:"fth"`
-	Fame       int        `json:"fame"`
-	Civ        int        `json:"civ"`
-	Tech       int        `json:"tech"`
-	Hp         int        `json:"hp"`
-	Atk        int        `json:"atk"`
-	Rush       int        `json:"rush"`
-	Def        int        `json:"def"`
-	// accept string (eg 13.0M), convert to number in frontend
-	TotalPower int `json:"totalPower"`
-	// 0 means not unlocked
-	ZombieForm int `json:"zombieForm"`
-	// 0 means not unlocked
-	DemonForm int `json:"demonForm"`
-	// 0 means not unlocked
-	AngelForm int `json:"angelForm"`
-	// 0 means not unlocked
-	MutantForm int `json:"mutantForm"`
-	// 0 means not unlocked
-	MechaForm int `json:"mechaForm"`
-	// 0 means not unlocked
-	DragonForm         int `json:"dragonForm"`
-	SpeciesWarEssences int `json:"speciesWarEssences"`
+	Club               int        `json:"club"`
+	SWKit              string     `json:"swKit" db:"allowempty"`
+	SWKitRank          int        `json:"swKitRank"`
+	Server             ServerName `json:"server"`
+	ServerNum          int        `json:"serverNum"`
+	Leadership         int        `json:"leadership"`
+	Art                int        `json:"art"`
+	Fth                int        `json:"fth"`
+	Fame               int        `json:"fame"`
+	Civ                int        `json:"civ"`
+	Tech               int        `json:"tech"`
+	Hp                 int        `json:"hp"`
+	Atk                int        `json:"atk"`
+	Rush               int        `json:"rush"`
+	Def                int        `json:"def"`
+	TotalPower         int        `json:"totalPower"` // accept string (eg 13.0M), convert to number in frontend
+	ZombieForm         int        `json:"zombieForm"` // 0 means not unlocked
+	DemonForm          int        `json:"demonForm"`  // 0 means not unlocked
+	AngelForm          int        `json:"angelForm"`  // 0 means not unlocked
+	MutantForm         int        `json:"mutantForm"` // 0 means not unlocked
+	MechaForm          int        `json:"mechaForm"`  // 0 means not unlocked
+	DragonForm         int        `json:"dragonForm"` // 0 means not unlocked
+	SpeciesWarEssences int        `json:"speciesWarEssences"`
+	MinionSimPower     int        `json:"minionSimPower"` // accept string (eg 13.0M), convert to number in frontend
 }
 
 func (s *Snail) AddThisSnail() error {
@@ -124,6 +118,7 @@ func (s *Snail) AddThisSnail() error {
 		s.MechaForm,
 		s.DragonForm,
 		s.SpeciesWarEssences,
+		s.MinionSimPower,
 	)
 	return err
 }
@@ -156,6 +151,7 @@ func (s *Snail) UpdateThisSnail() error {
 		s.MechaForm,
 		s.DragonForm,
 		s.SpeciesWarEssences,
+		s.MinionSimPower,
 	)
 	return err
 }

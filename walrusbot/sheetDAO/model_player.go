@@ -355,6 +355,7 @@ func (m *Player) _asyncDelete(snails []*Snail) error {
 				v.MechaForm,
 				v.DragonForm,
 				v.SpeciesWarEssences,
+				v.MinionSimPower,
 				now,
 				now,
 			},

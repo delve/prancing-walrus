@@ -33,17 +33,17 @@ func snailAdd(ctx *disgolf.Ctx) {
 		return
 	}
 	if snail != nil {
-		_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("Sorry, you already told me about that snail. Try `/snail show %s` to check up on them.\nIf this is a new snail in a different server then you can give me a nickname for it.", ctx.Options["name"].StringValue()), true, ctx))
+		_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("Sorry, you already told me about that snail. Try `/snail show:%s` to check up on them.\nIf this is a new snail in a different server then you can give me a nickname for it.", ctx.Options["name"].StringValue()), true, ctx))
 		return
 	}
 
-	snail, err = player.AddSnail(int(time.Now().Unix()), ctx.Options["name"].StringValue(), 1, "", 0, "", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+	snail, err = player.AddSnail(int(time.Now().Unix()), ctx.Options["name"].StringValue(), 1, "", 0, "", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 	if err != nil {
 		_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, there was a problem adding your snail. Paging <pingCaretakerRole> to review the log", true, ctx))
 		log.Errorw("Error adding snail in /snail add", "err", err)
 		return
 	}
-	_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("Thanks for telling me about %s! Please use `/snail update %s` to tell me more about them.", snail.SnailName, snail.SnailName), true, ctx))
+	_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("Thanks for telling me about %s! Please use `/snail update:%s` to tell me more about them.", snail.SnailName, snail.SnailName), true, ctx))
 
 }
 
@@ -109,7 +109,7 @@ func snailUpdate(ctx *disgolf.Ctx) {
 		// error already logged in updateSnail()
 		return
 	}
-	_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("Thanks! I've updated what I know about %s. You can use `/snail show %s` to confirm it.", ctx.Options["name"].StringValue(), ctx.Options["name"].StringValue()), true, ctx))
+	_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("Thanks! I've updated what I know about %s. You can use `/snail show:%s` to confirm it.", ctx.Options["name"].StringValue(), ctx.Options["name"].StringValue()), true, ctx))
 
 }
 
@@ -160,6 +160,7 @@ func formatSnailStats(snail *sheetDAO.Snail) string {
 	sb.WriteString(fmt.Sprintf("Server: %s %d\tClub: %s\n", snail.Server, snail.ServerNum, club.Name))
 	sb.WriteString(fmt.Sprintf("Leadership: %d\tHoarded SW Essences: %d\n", snail.Leadership, snail.SpeciesWarEssences))
 	sb.WriteString(fmt.Sprintf("Total Power: %d\n", snail.TotalPower))
+	sb.WriteString(fmt.Sprintf("Minion Sim Power: %d\n", snail.MinionSimPower))
 	sb.WriteString(fmt.Sprintf("__AFFCT__\nArt \t%d\tFaith\t%d\nFame\t%d\tCiv\t%d\nTech \t%d\n", snail.Art, snail.Fth, snail.Fame, snail.Civ, snail.Tech))
 	sb.WriteString(fmt.Sprintf("__HARD__\nHP \t%d\tAtk\t%d\nRush\t%d\tDef\t%d\n", snail.Hp, snail.Atk, snail.Rush, snail.Def))
 	// custom emoji in the Snailverse server
@@ -371,6 +372,19 @@ func updateThisSnail(ctx *disgolf.Ctx) error {
 				break
 			}
 			snail.DragonForm = int(option.IntValue())
+		case "simpower":
+			stat = "minion sim power"
+			value, err := helpers.DebreviateNumber(option.StringValue())
+			if err != nil {
+				responses = append(responses, fmt.Sprintf("Your %s (%s) doesn't look like a valid number: %s", stat, option.StringValue(), err))
+				break
+			}
+			if value < 0 {
+				responses = append(responses, fmt.Sprintf("%d? Are you sure that's your %s?", int(value), stat))
+				break
+			}
+			// discard any remaining fraction, there shouldn't be any in this context anyway
+			snail.MinionSimPower = int(value)
 
 		case "newname":
 			//lint:ignore SA6000 looping over a map, this only triggers once

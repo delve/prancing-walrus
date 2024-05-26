@@ -240,4 +240,10 @@ var snailStatsOptions = []*discordgo.ApplicationCommandOption{
 		Description: "Change your snail's name",
 		Required:    false,
 	},
+	{
+		Type:        discordgo.ApplicationCommandOptionString,
+		Name:        "simpower",
+		Description: "Snail's minion sim power (EG 3.2M)",
+		Required:    false,
+	},
 }
