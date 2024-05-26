@@ -77,12 +77,12 @@ func calculateClubAssignments(club int, clubname string) error {
 	log.Infow("calculating kit assignments for club", "clubId", club, "clubName", clubname)
 	// get club snails, sorted by leadership ascending
 	clubFilter := func(snail *sheetDAO.Snail) bool { return snail.Club == club }
-	leaderSort := func(snails []*sheetDAO.Snail) {
+	simPowerSort := func(snails []*sheetDAO.Snail) {
 		slices.SortStableFunc(snails,
-			func(a, b *sheetDAO.Snail) int { return a.Leadership - b.Leadership })
+			func(a, b *sheetDAO.Snail) int { return a.MinionSimPower - b.MinionSimPower })
 	}
 
-	snails, err := sheetDAO.GetAllSnails(sheetDAO.SnailFilter(clubFilter), sheetDAO.SnailSort(leaderSort))
+	snails, err := sheetDAO.GetAllSnails(sheetDAO.SnailFilter(clubFilter), sheetDAO.SnailSort(simPowerSort))
 	if err != nil {
 		return err
 	}

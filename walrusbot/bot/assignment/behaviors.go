@@ -2,6 +2,7 @@ package assignment
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"walrusbot/sheetDAO"
 	"walrusbot/utility/config"
@@ -9,6 +10,7 @@ import (
 	"walrusbot/utility/log"
 
 	"github.com/FedorLap2006/disgolf"
+	"github.com/olekukonko/tablewriter"
 	"golang.org/x/exp/slices"
 )
 
@@ -74,7 +76,12 @@ func assignmentView(ctx *disgolf.Ctx) {
 	}
 
 	msg := getKitAssignments(clubName)
-	_ = ctx.Respond(helpers.GetDefaultResponse(msg, true, ctx))
+
+	response := helpers.GetDefaultResponse(msg, true, ctx)
+	err := ctx.Respond(response)
+	if err != nil {
+		log.Errorw("error sending disco response", "error", err, "response", response)
+	}
 }
 
 func getAssignmentMessage(name string, sass bool) (assignMsg string) {
@@ -118,8 +125,6 @@ func canListAssignments(ctx *disgolf.Ctx, club string) bool {
 }
 
 func getKitAssignments(clubName string) string {
-	var msg strings.Builder
-
 	clubRec, err := sheetDAO.GetClubByName(clubName)
 	if err != nil {
 		log.Warnw("could not find club in getKitAssignments", "club", clubName)
@@ -142,10 +147,20 @@ func getKitAssignments(clubName string) string {
 		return "Oops. Had a problem retrieving the list :confounded:"
 	}
 
+	msg := &strings.Builder{}
 	msg.WriteString(fmt.Sprintf("__Species War Kit Assignments for %s__\n", clubName))
+
+	data := [][]string{}
 	for _, snail := range snails {
-		msg.WriteString(fmt.Sprintf("%d\t%s\t%s (Leadership: %d)\n", snail.SWKitRank, snail.SWKit, snail.SnailName, snail.Leadership))
+		data = append(data, []string{strconv.Itoa(snail.SWKitRank), snail.SWKit, snail.SnailName, strconv.Itoa(snail.Leadership), strconv.Itoa(snail.MinionSimPower)})
+		// msg.WriteString(fmt.Sprintf("%d\t%s\t%s (Leadership: %d)\n", snail.SWKitRank, snail.SWKit, snail.SnailName, snail.Leadership))
 	}
+
+	table := tablewriter.NewWriter(msg)
+	table.SetHeader([]string{"Rank", "Kit", "Snail", "Leadership", "SimPower"})
+	// table.SetAlignment(tablewriter.ALIGN_LEFT)
+	table.AppendBulk(data)
+	table.Render()
 
 	return msg.String()
 }
