@@ -3,61 +3,76 @@ package snail
 import (
 	"walrusbot/utility/helpers"
 
-	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
+	"github.com/zekrotja/ken"
 )
 
-type alreadyResponded string
+type Snail struct{}
 
-func (e alreadyResponded) Error() string {
-	return "already responded"
+var (
+	_ ken.SlashCommand = (*Snail)(nil)
+	_ ken.DmCapable    = (*Snail)(nil)
+)
+
+func (c *Snail) Name() string {
+	return "snail"
 }
 
-var addSnail = func(ctx *disgolf.Ctx) {
-	helpers.HandlerWrapper("snail", ctx, snailAdd)
+func (c *Snail) Description() string {
+	return "Manage your snail(s)"
 }
 
-var listSnail = func(ctx *disgolf.Ctx) {
-	helpers.HandlerWrapper("snail", ctx, snailList)
+func (c *Snail) Version() string {
+	return "1.0.0"
 }
 
-var showSnail = func(ctx *disgolf.Ctx) {
-	helpers.HandlerWrapper("snail", ctx, snailShow)
+func (c *Snail) Type() discordgo.ApplicationCommandType {
+	return discordgo.ChatApplicationCommand
 }
 
-var updateSnail = func(ctx *disgolf.Ctx) {
-	helpers.HandlerWrapper("snail", ctx, snailUpdate)
+func (c *Snail) IsDmCapable() bool {
+	return true
 }
 
-var Snail = &disgolf.Command{
-	Name:        "snail",
-	Description: "Manage your snail(s)",
-	Type:        discordgo.ChatApplicationCommand,
-	/* handlers for the base command don't appear to be necessary
-	MessageHandler: disgolf.MessageHandlerFunc(func(ctx *disgolf.MessageCtx) {
-		// Default handler, no subcommand selected
-		_, _ = ctx.Reply("hi (default)", false)
-	}),*/
-	/* a handlers for the base command doesn't appear to be necessary
-	Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-		_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("You have to use a subcommand your snailness. %v", subCommandList), true, ctx))
-	}),*/
-	SubCommands: disgolf.NewRouter([]*disgolf.Command{
-		{ // add command
+func (c *Snail) Options() []*discordgo.ApplicationCommandOption {
+	return []*discordgo.ApplicationCommandOption{
+		{
+			Type:        discordgo.ApplicationCommandOptionSubCommand,
 			Name:        "add",
 			Description: "Add a new snail.",
-			Options: []*discordgo.ApplicationCommandOption{{
-				Type:        discordgo.ApplicationCommandOptionString,
-				Name:        "name",
-				Description: "Name of the snail you want to add",
-				Required:    true,
-			}},
-			Handler: disgolf.HandlerFunc(addSnail),
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "name",
+					Description: "Name of the snail you want to add",
+					Required:    true,
+				},
+			},
 		},
-		{ // list command
+		{
+			Type:        discordgo.ApplicationCommandOptionSubCommand,
 			Name:        "list",
 			Description: "Get a list of all your snails.",
-			Handler:     disgolf.HandlerFunc(listSnail),
+			Options:     []*discordgo.ApplicationCommandOption{},
+		},
+		{
+			Type:        discordgo.ApplicationCommandOptionSubCommand,
+			Name:        "show",
+			Description: "Show the stats of one of your snails",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "name",
+					Description: "Name of the snail you want to see",
+					Required:    true,
+				},
+			},
+		},
+		{
+			Type:        discordgo.ApplicationCommandOptionSubCommand,
+			Name:        "update",
+			Description: "Update your snails' stats.",
+			Options:     snailStatsOptions,
 		},
 		/* Delete requires a confirmation step, making it a more complex interaction, worry about it later
 		{
@@ -67,31 +82,6 @@ var Snail = &disgolf.Command{
 				_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, delete isn't implemented yet. Ask Mehh for assistance.", true, ctx))
 			}),
 		},*/
-		{ // show command
-			Name:        "show",
-			Description: "Show the stats of one of your snails",
-			Options: []*discordgo.ApplicationCommandOption{{
-				Type:        discordgo.ApplicationCommandOptionString,
-				Name:        "name",
-				Description: "Name of the snail you want to see",
-				Required:    true,
-			}},
-			Handler: disgolf.HandlerFunc(showSnail),
-		},
-		/* help subcommand is unimplemented
-		{
-			Name:        "help",
-			Description: "Get help with the `snail` command",
-			Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-				_ = ctx.Respond(helpers.GetDefaultResponse("help subcommand.", true, ctx))
-			}),
-		},*/
-		{ // update command
-			Name:        "update",
-			Description: "Update your snails' stats.",
-			Options:     snailStatsOptions,
-			Handler:     disgolf.HandlerFunc(updateSnail),
-		},
 		/* setserver requires another interaction step, making it a more complex interaction, worry about it later
 		{
 			Name:        "setserver",
@@ -100,7 +90,46 @@ var Snail = &disgolf.Command{
 				_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, setserver isn't implemented yet. Ask Mehh for assistance.", true, ctx))
 			}),
 		},*/
-	}),
+		/* help subcommand is unimplemented
+		{
+			Name:        "help",
+			Description: "Get help with the `snail` command",
+			Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
+				_ = ctx.Respond(helpers.GetDefaultResponse("help subcommand.", true, ctx))
+			}),
+		},*/
+	}
+}
+
+func (c *Snail) Run(ctx ken.Context) (err error) {
+	err = ctx.HandleSubCommands(
+		ken.SubCommandHandler{Name: "add", Run: c.add},
+		ken.SubCommandHandler{Name: "list", Run: c.list},
+		ken.SubCommandHandler{Name: "show", Run: c.show},
+		ken.SubCommandHandler{Name: "update", Run: c.update},
+	)
+
+	return
+}
+
+func (c *Snail) add(ctx ken.SubCommandContext) (err error) {
+	snailAdd(ctx)
+	return
+}
+
+func (c *Snail) list(ctx ken.SubCommandContext) (err error) {
+	snailList(ctx)
+	return
+}
+
+func (c *Snail) show(ctx ken.SubCommandContext) (err error) {
+	snailShow(ctx)
+	return
+}
+
+func (c *Snail) update(ctx ken.SubCommandContext) (err error) {
+	snailUpdate(ctx)
+	return
 }
 
 var snailStatsOptions = []*discordgo.ApplicationCommandOption{

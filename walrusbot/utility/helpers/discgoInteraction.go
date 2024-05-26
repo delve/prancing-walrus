@@ -7,6 +7,7 @@ import (
 
 	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
+	"github.com/zekrotja/ken"
 )
 
 // TODO: create addCustomEmoji to parse custom emoji easier
@@ -20,7 +21,7 @@ import (
 <:dragon:1211480752311509042>
 */
 
-func GetDefaultResponse(message string, ephemeral bool, ctx *disgolf.Ctx) *discordgo.InteractionResponse {
+func GetDefaultResponse(message string, ephemeral bool, ctx ken.Context) *discordgo.InteractionResponse {
 	msg := addPings(ctx, message)
 	// <@& indicates an attempt to ping a role
 	if ephemeral && strings.Contains(msg, "<@&") {

@@ -1,44 +1,57 @@
 package club
 
 import (
-	"walrusbot/utility/helpers"
-
-	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
+	"github.com/zekrotja/ken"
 )
 
-var listMembers = func(ctx *disgolf.Ctx) {
-	helpers.HandlerWrapper("club", ctx, memberList)
+type Club struct{}
+
+var (
+	_ ken.SlashCommand = (*Club)(nil)
+	_ ken.DmCapable    = (*Club)(nil)
+	// _ ken.AutocompleteCommand = (*Club)(nil)
+)
+
+func (c *Club) Name() string {
+	return "club"
 }
 
-var inductSnail = func(ctx *disgolf.Ctx) {
-	helpers.HandlerWrapper("club", ctx, snailInduct)
+func (c *Club) Description() string {
+	return "Manage your club(s)"
 }
 
-var kickSnail = func(ctx *disgolf.Ctx) {
-	helpers.HandlerWrapper("club", ctx, snailKick)
+func (c *Club) Version() string {
+	return "1.0.0"
 }
 
-var Club = &disgolf.Command{
-	Name:        "club",
-	Description: "Manage your club(s)",
-	Type:        discordgo.ChatApplicationCommand,
-	/* handlers for the base command don't appear to be necessary
-	MessageHandler: disgolf.MessageHandlerFunc(func(ctx *disgolf.MessageCtx) {
-		// Default handler, no subcommand selected
-		_, _ = ctx.Reply("hi (default)", false)
-	}),*/
-	/* a handlers for the base command doesn't appear to be necessary
-	Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-		_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("You have to use a subcommand your snailness. %v", subCommandList), true, ctx))
-	}),*/
-	SubCommands: disgolf.NewRouter([]*disgolf.Command{
-		{ // list members command
+func (c *Club) Type() discordgo.ApplicationCommandType {
+	return discordgo.ChatApplicationCommand
+}
+
+func (c *Club) IsDmCapable() bool {
+	return true
+}
+
+func (c *Club) Run(ctx ken.Context) (err error) {
+	err = ctx.HandleSubCommands(
+		ken.SubCommandHandler{Name: "members", Run: c.memberList},
+		ken.SubCommandHandler{Name: "induct", Run: c.snailInduct},
+		ken.SubCommandHandler{Name: "kick", Run: c.snailKick},
+	)
+
+	return
+}
+
+func (c *Club) Options() []*discordgo.ApplicationCommandOption {
+	return []*discordgo.ApplicationCommandOption{
+		{
+			Type:        discordgo.ApplicationCommandOptionSubCommand,
 			Name:        "members",
 			Description: "Get a list of all the snails in your club(s).",
-			Handler:     disgolf.HandlerFunc(listMembers),
 		},
-		{ // induct command
+		{
+			Type:        discordgo.ApplicationCommandOptionSubCommand,
 			Name:        "induct",
 			Description: "Officers only. Induct a snail into your club.",
 			Options: []*discordgo.ApplicationCommandOption{
@@ -55,26 +68,19 @@ var Club = &disgolf.Command{
 					Required:    false,
 				},
 			},
-			Handler: disgolf.HandlerFunc(inductSnail),
 		},
-		/* help subcommand is unimplemented
 		{
-			Name:        "help",
-			Description: "Get help with the `snail` command",
-			Handler: disgolf.HandlerFunc(func(ctx *disgolf.Ctx) {
-				_ = ctx.Respond(helpers.GetDefaultResponse("help subcommand.", true, ctx))
-			}),
-		},*/
-		{ // kick command
+			Type:        discordgo.ApplicationCommandOptionSubCommand,
 			Name:        "kick",
 			Description: "Officers only. Kick a snail out of your club.",
-			Options: []*discordgo.ApplicationCommandOption{{
-				Type:        discordgo.ApplicationCommandOptionString,
-				Name:        "snail",
-				Description: "Name of the snail you want to induct",
-				Required:    true,
-			}},
-			Handler: disgolf.HandlerFunc(kickSnail),
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "snail",
+					Description: "Name of the snail you want to induct",
+					Required:    true,
+				},
+			},
 		},
-	}),
+	}
 }

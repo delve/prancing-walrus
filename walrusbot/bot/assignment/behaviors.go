@@ -5,84 +5,13 @@ import (
 	"strconv"
 	"strings"
 	"walrusbot/sheetDAO"
-	"walrusbot/utility/config"
 	"walrusbot/utility/helpers"
 	"walrusbot/utility/log"
 
-	"github.com/FedorLap2006/disgolf"
 	"github.com/olekukonko/tablewriter"
+	"github.com/zekrotja/ken"
 	"golang.org/x/exp/slices"
 )
-
-func assignmentRefresh(ctx *disgolf.Ctx) {
-	refreshRoleId, err := helpers.GetRoleId(ctx, config.Values.Roles["CanRefresh"])
-	if refreshRoleId == "" || err != nil {
-		log.Errorw("error finding role ID", "roleTag", "CanRefresh", "configuredRole", config.Values.Roles["CanRefresh"], "error", err)
-		return
-	}
-
-	if helpers.CheckRoleMembership(ctx, refreshRoleId) {
-		_ = ctx.Respond(helpers.GetDefaultResponse("Refreshing assignment cache.", false, ctx))
-		CacheAssignments()
-		// TODO: figure out mutlipart interaction responses
-	} else {
-		_ = ctx.Respond(helpers.GetDefaultResponse("This command is not available to this user in this context.", true, ctx))
-	}
-
-}
-
-func requestAssignment(ctx *disgolf.Ctx) {
-	sass := (ctx.Caller.Name == "myass")
-	_ = ctx.Respond(helpers.GetDefaultResponse(getAssignmentMessage(ctx.Interaction.Member.User.Username, sass), true, ctx))
-}
-
-func assignmentCalculate(ctx *disgolf.Ctx) {
-	refreshRoleId, err := helpers.GetRoleId(ctx, config.Values.Roles["CanRefresh"])
-	if refreshRoleId == "" || err != nil {
-		log.Errorw("error finding role ID", "roleTag", "CanRefresh", "configuredRole", config.Values.Roles["CanRefresh"], "error", err)
-		return
-	}
-
-	if helpers.CheckRoleMembership(ctx, refreshRoleId) {
-		_ = ctx.Respond(helpers.GetDefaultResponse("Calculating kit assignments.", false, ctx))
-		calculateAssignments()
-		// TODO: figure out mutlipart interaction responses
-	} else {
-		_ = ctx.Respond(helpers.GetDefaultResponse("This command is not available to this user in this context.", true, ctx))
-	}
-}
-
-func assignmentView(ctx *disgolf.Ctx) {
-	clubName := ""
-	val, ok := ctx.Options["club"]
-
-	if ok {
-		clubName = val.StringValue()
-	} else {
-		player, err := sheetDAO.GetPlayerByDiscoId(ctx.Interaction.Member.User.Username)
-		if err == nil {
-			snails, err := player.GetSnails()
-			if err == nil {
-				cr, err := sheetDAO.GetClub(snails[0].Club)
-				if err == nil {
-					clubName = cr.Name
-				}
-			}
-		}
-	}
-
-	if !canListAssignments(ctx, clubName) || clubName == "none" {
-		_ = ctx.Respond(helpers.GetDefaultResponse("That's not your club, sorry, can't help you.", true, ctx))
-	}
-
-	msg := getKitAssignments(clubName)
-
-	response := helpers.GetDefaultResponse(msg, true, ctx)
-	err := ctx.Respond(response)
-	if err != nil {
-		log.Errorw("error sending disco response", "error", err, "response", response)
-	}
-}
 
 func getAssignmentMessage(name string, sass bool) (assignMsg string) {
 	tone := 0
@@ -117,8 +46,8 @@ func getAssignmentMessage(name string, sass bool) (assignMsg string) {
 	return
 }
 
-func canListAssignments(ctx *disgolf.Ctx, club string) bool {
-	if helpers.IsDiscoUserInClub(ctx.Interaction.Member.User.Username, club) {
+func canListAssignments(ctx ken.Context, club string) bool {
+	if helpers.IsDiscoUserInClub(ctx.User().Username, club) {
 		return true
 	}
 	return helpers.IsClubOfficer(ctx, club)
