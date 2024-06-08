@@ -13,13 +13,11 @@ https://gitpod.io/#https://github.com/delve/prancing-walrus
 * find a way to publish logs to walrus wranglers
 ### After 1.0
 * extra tabs for adhoc notes. EG: what war is next, and a generic note.
-* reorganize with https://github.com/FedorLap2006/disgolf/blob/master/examples/modules/main.go ?
 * automatic recaching once when someone is missing an assignment (if older than (3?)hours)
 * automatic recaching every 24 hours (if older than (3?)hours)
 * backoff retry on recaching
 * make log messages show correct caller, not `"caller":"log/log.go:20"`
 * make all config values read from env and default to configfile if not found
-* enable user updates. include failsafe for values out of bounds
 * in config the values pulled from env should be tested, if len == 0 panic
 * setup a sidechannel method to restart the host VM. consider ways to manage container version through it as well
 * several spots that assume only one guild (EG ctx.Session.State.Guilds[0]). these should be fixed
@@ -57,16 +55,53 @@ https://discord.com/oauth2/authorize?client_id=1169332084813348865&permissions=5
 
 # Dev-ing
 ## prereq
-set CONFIG, APIKey, and BOT_TOKEN env vars for this repo in gitpod user settings. CONFIG should be '../devconfig.json', BOT_TOKEN should be the bot token from Discord. Get yer own. The devconfig has a test app id and specific server id so as to not interfere with the 'production' bot.
+set CONFIG env var for this repo in gitpod user settings. CONFIG should be '../devconfig.json'
+
+BOT_TOKEN should be the bot token from Discord. Get yer own. The devconfig has a test app id and specific server id so as to not interfere with the 'production' bot.
 
 does app id need to be per dev also? worry about it when it's not just me. at some point consider loading both configs with merge/overwrite logic to reduce duplication
 
 PROD BOT_TOKEN and sheets APIKey stored in GCP Secrets Manager
 
+* TODO: How to deal with local config? probably just need to use viper here.
+* * per dev configs include discord app id, GCP project & SA names, disco test server id, DB sheet id, and all items in secret manager
+* * note that the test SA name also appears in the makefile, which is annoying
+
+### Setup GCP project
+* Create a project `gcloud projects create --name TestWalrus` accept the generated ID
+* * `project=$(gcloud projects list | grep TestWalrus | awk '{ print $1 }')` (note that this is also already in gitpodconfig)
+* Setup a billing account for the test project (cost will be pennies at most). i just use console for this
+* Enable APIs
+* * `gcloud services enable secretmanager.googleapis.com`
+* * `gcloud services enable iam.googleapis.com`
+* * `gcloud services enable sheets.googleapis.com`
+
+* create service account test-walrus-sheet-access
+* * `gcloud iam service-accounts create test-walrus-sheet-access`
+* * add permissions
+* * * `saId=$(gcloud iam service-accounts list | grep test-walrus | awk '{ print $1 }')`
+* * * for secrets manager read access `gcloud projects add-iam-policy-binding ${project} --member=serviceAccount:${saId} --role="roles/secretmanager.secretAccessor"`
+* * * for generate SA key for sheets access `gcloud projects add-iam-policy-binding ${project} --member=serviceAccount:${saId} --role="roles/iam.serviceAccountKeyAdmin"`
+* setup secretmanager
+* * add bot token
+* * * `secret="whatever your bot token is"`
+* * * `printf $secret | gcloud secrets create BOT_TOKEN --data-file=-`
+* * Are these 2 still required??
+* * add SheetsAPIKey key
+* * * `secret="whatever your sheets API key is"`
+* * * `printf $secret | gcloud secrets create SheetsAPIKey --data-file=-`
+* * add sheets OAUTH
+* * * `secret="whatever your sheets OAUTH cert is"`
+* * * `printf $secret | gcloud secrets create SheetsOauth --data-file=-`
+
+
+* generate a test DB google sheet (instructions pending)
+* * add SA email to gsheet permissions as editor
+* Get a bot token from discord
 * to enable local service account impersonation through ADC for dev work:
 * * mymail=the email address of your gcp user id
-* * prj=`gcloud config get-value project`;useremail="user:${mymail}"
-* * to enable SA token creation `gcloud projects add-iam-policy-binding ${prj} --member=${useremail} --role="roles/iam.serviceAccountTokenCreator"`
+* * `project=$(gcloud projects list | grep TestWalrus | awk '{ print $1 }');useremail="user:${mymail}"`
+* * to enable SA token creation `gcloud projects add-iam-policy-binding ${project} --member=${useremail} --role="roles/iam.serviceAccountTokenCreator"`
 * * note that this can apparently take up to ten minutes to actually apply, which is incredibly frustrating when you're debugging something.
 * * also note that apparently 'roles/owner' does NOT include this, for whatever reason.
 
@@ -99,14 +134,11 @@ TODO: consider Terraform :(
 * * * for logging `gcloud projects add-iam-policy-binding ${prj} --member=${saId} --role=roles/logging.logWriter`
 * * * for artifact registry `gcloud projects add-iam-policy-binding ${prj} --member=${saId} --role=roles/artifactregistry.reader`
 * * * for secrets manager read access `gcloud projects add-iam-policy-binding ${prj} --member=${saId} --role="roles/secretmanager.secretAccessor"`
-* * * te generate SA key for sheets access `gcloud projects add-iam-policy-binding ${prj} --member=${saId} --role="roles/iam.serviceAccountKeyAdmin"`
-
+* * * for generate SA key for sheets access `gcloud projects add-iam-policy-binding ${prj} --member=${saId} --role="roles/iam.serviceAccountKeyAdmin"`
 * * * add SA email to gsheet permissions as editor
 * setup secretmanager
 * * add bot token
 * * add API key (this is for sheets, probably don't need it anymore?!?)
-* * create key for SA from IAM Service Accounts > ...s > Manage keys > Add Key > Create New Key > JSON, create
-* * upload key file to secret manager, delete local file.
 * create VM
 * * select deploy container 
 ```

@@ -1,6 +1,5 @@
 {
-    "BotPrefix": ["w.", "walrus."],
-    "GcpProject": "prancingwalrus",
+    "GcpProject": "testwalrus-425815",
     "AppId": "1170099827611291761",
     "ServerId": "775636532161019955",
     "WarPlanningChannels": [
@@ -8,8 +7,6 @@
         "👥・species-war",
         "🏯・species-war"
     ],
-    "TestSheetId": "1IwlPZuguMh6e7gMDS3PlTjsjBEDa8lBJrnImKPm8UA4",
-    "LiveSheetId": "1IwlPZuguMh6e7gMDS3PlTjsjBEDa8lBJrnImKPm8UA4",
     "SheetId": "1IwlPZuguMh6e7gMDS3PlTjsjBEDa8lBJrnImKPm8UA4",
     "DbSheetId": "18pqTrKEncHH2RJ9-R3wUKnN4gEjKaXzE0KvxUaxkiXo",
     "Roles": {
@@ -20,9 +17,9 @@
         "appLogs": true,
         "discgoLogs": false
     },
-    "GcpSAName": "walrus-sheet-access@prancingwalrus.iam.gserviceaccount.com",
+    "GcpSAName": "test-walrus-sheet-access@testwalrus-425815.iam.gserviceaccount.com",
     "SMgrSecretList": {
-        "botToken": "test_token",
+        "botToken": "BOT_TOKEN",
         "SheetsAPIKey": "SheetsAPIKey",
         "SheetsOauth": "SheetsOauth"
     },
