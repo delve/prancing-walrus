@@ -1,4 +1,4 @@
-containerVersion = v0.31
+containerVersion = v0.32
 debugVersion = test
 
 MODELS_DIR := ./walrusbot/sheetDAO
@@ -36,6 +36,7 @@ publishDebug: gcloudinit image
 gcloudinit: /tmp/gcloud.inited
 /tmp/gcloud.inited:
 	gcloud auth login
+	project=$$(gcloud projects list | grep TestWalrus | awk '{ print $$1 }') && gcloud config set project $$project
 	gcloud auth application-default login --impersonate-service-account test-walrus-sheet-access@testwalrus-425815.iam.gserviceaccount.com
 	docker login us-central1-docker.pkg.dev
 	touch /tmp/gcloud.inited

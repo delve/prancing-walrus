@@ -36,6 +36,11 @@ func main() {
 	log.Infow("Inited, main starting up...")
 	defer tidy()
 
+	cmdCacheFile := "./.tmp/.commandCache.json"
+	if _, err := os.Stat(cmdCacheFile); os.IsNotExist(err) {
+		os.MkdirAll("./.tmp", 0700)
+	}
+
 	// check the bot is minimally functional before loading any data
 	session, err := discordgo.New("Bot " + config.Values.Secrets.GetBotToken())
 	check.Err(err, "failed to init disgolf")
@@ -44,7 +49,7 @@ func main() {
 	session.Debug = config.Values.Debug["discgoLogs"]
 	k, err := ken.New(session, ken.Options{
 		// this errors because the directory doesn't exist. but i don't care right now.
-		CommandStore: store.NewLocalCommandStore("./.tmp/.commandCache.json"),
+		CommandStore: store.NewLocalCommandStore(cmdCacheFile),
 		// OnCommandError is called when an error occurs
 		// during middleware or command execution.
 		OnCommandError: func(err error, ctx *ken.Ctx) {
@@ -63,11 +68,6 @@ func main() {
 
 	check.Err(k.RegisterCommands(botcommands.Commands...))
 	defer k.Unregister()
-
-	// bot.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
-	// 	log.Infow("Bot session opened")
-	// })
-	// bot.AddHandler(bot.Router.HandleInteraction)
 
 	check.Err(session.Open())
 	defer session.Close()
