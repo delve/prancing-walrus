@@ -8,14 +8,13 @@ import (
 	"walrusbot/utility/helpers"
 	"walrusbot/utility/log"
 
-	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
 	"github.com/delve/sheetdb"
+	"github.com/zekrotja/ken"
 )
 
-func memberList(ctx *disgolf.Ctx) {
-
-	clubs, err := sheetDAO.GetPlayerClubMemberships(ctx.Interaction.Member.User.Username)
+func (c *Club) memberList(ctx ken.SubCommandContext) (err error) {
+	clubs, err := sheetDAO.GetPlayerClubMemberships(ctx.User().Username)
 	if err != nil {
 		log.Errorw("Error retrieving player club memberships in /club members", "err", err)
 		_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, there was an issue retrieving your club info. Paging <pingCaretakerRole> to review the log", true, ctx))
@@ -27,7 +26,7 @@ func memberList(ctx *disgolf.Ctx) {
 	}
 
 	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf("Hi %s! You have snails in %d clubs. Here's a list of all of them in no particular order.\n", ctx.Interaction.Member.User.Username, len(clubs)))
+	sb.WriteString(fmt.Sprintf("Hi %s! You have snails in %d clubs. Here's a list of all of them in no particular order.\n", ctx.User().Username, len(clubs)))
 	for _, club := range clubs {
 		sb.WriteString(fmt.Sprintf("\n--- __%s__ ---\n", club.Name))
 
@@ -37,10 +36,12 @@ func memberList(ctx *disgolf.Ctx) {
 			sb.WriteString(fmt.Sprintf("%s\n", member.SnailName))
 		}
 	}
-	_ = ctx.Respond(helpers.GetDefaultResponse(sb.String(), true, ctx))
+	err = ctx.Respond(helpers.GetDefaultResponse(sb.String(), true, ctx))
+
+	return
 }
 
-func snailInduct(ctx *disgolf.Ctx) {
+func (c *Club) snailInduct(ctx ken.SubCommandContext) (err error) {
 	var sb strings.Builder
 	var targetClub *sheetDAO.Club
 
@@ -49,6 +50,7 @@ func snailInduct(ctx *disgolf.Ctx) {
 		role   *discordgo.Role
 		record *sheetDAO.Club
 	}
+
 	officerRoles := []officerRole{}
 	for _, rle := range helpers.GetOfficerRoleMemberships(ctx) {
 		// get the club from the DB using the abbreviation at the front of the role name
@@ -73,22 +75,21 @@ func snailInduct(ctx *disgolf.Ctx) {
 	sb.Reset()
 
 	// if club param given
-	clubParam, ok := ctx.Options["club"]
-	if ok {
+	if clubParam, ok := ctx.Options().GetByNameOptional("club"); ok {
 		// validate club name
 		club, err := sheetDAO.GetClubByName(clubParam.StringValue())
 		if _, isNotFound := err.(*sheetdb.NotFoundError); isNotFound {
-			msg := fmt.Sprintf("I've never heard of the club %s.", ctx.Options["club"].StringValue())
+			msg := fmt.Sprintf("I've never heard of the club %s.", clubParam.StringValue())
 			if len(playerClubList) > 0 {
 				msg = fmt.Sprintf("%s Did you mean one of these?\n%s", msg, playerClubList)
 			}
 			_ = ctx.Respond(helpers.GetDefaultResponse(msg, true, ctx))
-			return
+			return err
 		}
 		if err != nil {
 			_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, there was a problem getting your club info. Paging <pingCaretakerRole> to review the log", true, ctx))
 			log.Errorw("Error retrieving player clubs in /club induct", "err", err)
-			return
+			return err
 		}
 
 		targetClub = club
@@ -108,15 +109,16 @@ func snailInduct(ctx *disgolf.Ctx) {
 	}
 
 	// check target snail club membership, if already in a club abort
-	snailFilter := func(snail *sheetDAO.Snail) bool { return snail.SnailName == ctx.Options["snail"].StringValue() }
+	snailName := ctx.Options().GetByName("snail").StringValue()
+	snailFilter := func(snail *sheetDAO.Snail) bool { return snail.SnailName == snailName }
 	snail, err := sheetDAO.GetAllSnails(sheetDAO.SnailFilter(snailFilter))
 	if _, isNotFound := err.(*sheetdb.NotFoundError); isNotFound {
-		_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("I don't know any snail named %s.", ctx.Options["snail"].StringValue()), true, ctx))
+		_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("I don't know any snail named %s.", snailName), true, ctx))
 		return
 	}
 	if err != nil || len(snail) != 1 { // if there's an error or we don't get exactly 1 snail, abort
 		_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, there was a problem. Paging <pingCaretakerRole> to review the log", true, ctx))
-		log.Errorw("Error retrieving target snail in /club induct", "err", err)
+		log.Errorw("Error retrieving target snail in /club induct", "err", err, "snailCount", len(snail))
 		return
 	}
 
@@ -133,25 +135,27 @@ func snailInduct(ctx *disgolf.Ctx) {
 		log.Errorw("Error updating target snail in /club induct", "err", err)
 		return
 	}
-	_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("%s has been inducted to %s! Send them my congratulations and a big hug <:lucylove:1181734603401220177>", ctx.Options["snail"].StringValue(), targetClub.Name), true, ctx))
+	_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("%s has been inducted to %s! Send them my congratulations and a big hug <:lucylove:1181734603401220177>", snailName, targetClub.Name), true, ctx))
+	return
 }
 
-func snailKick(ctx *disgolf.Ctx) {
+func (c *Club) snailKick(ctx ken.SubCommandContext) (err error) {
 	// check target snail club membership
-	snailFilter := func(snail *sheetDAO.Snail) bool { return snail.SnailName == ctx.Options["snail"].StringValue() }
+	snailName := ctx.Options().GetByName("snail").StringValue()
+	snailFilter := func(snail *sheetDAO.Snail) bool { return snail.SnailName == snailName }
 	snails, err := sheetDAO.GetAllSnails(sheetDAO.SnailFilter(snailFilter))
 	if _, isNotFound := err.(*sheetdb.NotFoundError); isNotFound {
-		_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("I don't know any snail named %s.", ctx.Options["snail"].StringValue()), true, ctx))
+		_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("I don't know any snail named %s.", snailName), true, ctx))
 		return
 	}
 	if err != nil || len(snails) != 1 { // if there's an error or we don't get exactly 1 snail, abort
 		_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, there was a problem. Paging <pingCaretakerRole> to review the log", true, ctx))
-		log.Errorw("Error retrieving target snail in /club kick", "err", err)
+		log.Errorw("Error retrieving target snail in /club kick", "err", err, "snailCount", len(snails))
 		return
 	}
 	snail := snails[0]
 
-	if snail.Club == 1 { // they're in a club already, they need to leave the current one first.
+	if snail.Club == 1 { // they're not in a club! nothing to kick them from, jerk
 		_ = ctx.Respond(helpers.GetDefaultResponse("Sorry, that snail isn't in a club. Don't kick a snail while they're down.", true, ctx))
 		return
 	}
@@ -180,5 +184,7 @@ func snailKick(ctx *disgolf.Ctx) {
 		log.Errorw("Error updating target snail in /club induct", "err", err)
 		return
 	}
-	_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("%s has been kicked from your club. I hope everyone is still on good terms.\nRemember, I'm just a walrus. I can't update the game so you'll have to log into Snails to remove them properly.", ctx.Options["snail"].StringValue()), true, ctx))
+	_ = ctx.Respond(helpers.GetDefaultResponse(fmt.Sprintf("%s has been kicked from your club. I hope everyone is still on good terms.\nRemember, I'm just a walrus. I can't update the game so you'll have to log into Snails to remove them properly.", snailName), true, ctx))
+
+	return
 }

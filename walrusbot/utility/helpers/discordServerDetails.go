@@ -7,14 +7,14 @@ import (
 	"walrusbot/sheetDAO"
 	"walrusbot/utility/log"
 
-	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
+	"github.com/zekrotja/ken"
 )
 
 var IntegerOptionZeroValue = 0.0
 
-func GetRoleId(ctx *disgolf.Ctx, roleName string) (string, error) {
-	for _, guildRole := range ctx.Session.State.Guilds[0].Roles {
+func GetRoleId(ctx ken.Context, roleName string) (string, error) {
+	for _, guildRole := range ctx.GetSession().State.Guilds[0].Roles {
 		if guildRole.Name == roleName {
 			return guildRole.ID, nil
 		}
@@ -22,8 +22,8 @@ func GetRoleId(ctx *disgolf.Ctx, roleName string) (string, error) {
 	return "", errors.New("role not found")
 }
 
-func CheckRoleMembership(ctx *disgolf.Ctx, roleID string) bool {
-	for _, v := range ctx.Interaction.Member.Roles {
+func CheckRoleMembership(ctx ken.Context, roleID string) bool {
+	for _, v := range ctx.GetEvent().Member.Roles {
 		if v == roleID {
 			return true
 		}
@@ -31,10 +31,15 @@ func CheckRoleMembership(ctx *disgolf.Ctx, roleID string) bool {
 	return false
 }
 
-func getOfficerRoles(ctx *disgolf.Ctx) (roles []*discordgo.Role) {
+func getOfficerRoles(ctx ken.Context) (roles []*discordgo.Role) {
 	roles = []*discordgo.Role{}
 	r := regexp.MustCompile(".* Officers$")
-	for _, guildRole := range ctx.Session.State.Guilds[0].Roles {
+	guildRoles, err := ctx.GetSession().GuildRoles(ctx.GetEvent().GuildID)
+	if err != nil {
+		log.Errorw("Error loading roles in getOfficerRoles", "error", err, "event", ctx.GetEvent())
+		return
+	}
+	for _, guildRole := range guildRoles {
 		if r.Match([]byte(guildRole.Name)) {
 			roles = append(roles, guildRole)
 		}
@@ -42,10 +47,10 @@ func getOfficerRoles(ctx *disgolf.Ctx) (roles []*discordgo.Role) {
 	return
 }
 
-func GetOfficerRoleMemberships(ctx *disgolf.Ctx) (memberships []*discordgo.Role) {
+func GetOfficerRoleMemberships(ctx ken.Context) (memberships []*discordgo.Role) {
 	memberships = []*discordgo.Role{}
 	officerRoles := getOfficerRoles(ctx)
-	for _, role := range ctx.Interaction.Member.Roles {
+	for _, role := range ctx.GetEvent().Member.Roles {
 		for _, officerRole := range officerRoles {
 			if role == officerRole.ID {
 				memberships = append(memberships, officerRole)
@@ -81,7 +86,7 @@ func IsDiscoUserInClub(username, club string) bool {
 	return false
 }
 
-func IsClubOfficer(ctx *disgolf.Ctx, club string) bool {
+func IsClubOfficer(ctx ken.Context, club string) bool {
 	officerRole := strings.ReplaceAll(club, " ", "") + " Officers"
 	officerRoleId, err := GetRoleId(ctx, officerRole)
 	if err != nil {

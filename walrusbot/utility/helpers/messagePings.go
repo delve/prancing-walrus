@@ -6,10 +6,10 @@ import (
 	"walrusbot/utility/config"
 	"walrusbot/utility/log"
 
-	"github.com/FedorLap2006/disgolf"
+	"github.com/zekrotja/ken"
 )
 
-func addPings(ctx *disgolf.Ctx, message string) string {
+func addPings(ctx ken.Context, message string) string {
 	ret := message
 	r := regexp.MustCompile("<ping([^>]*)>")
 

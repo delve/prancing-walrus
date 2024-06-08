@@ -1,9 +1,9 @@
-containerVersion = v0.21
+containerVersion = v0.31
 debugVersion = test
 
 MODELS_DIR := ./walrusbot/sheetDAO
 MODELS_GO := $(MODELS_DIR)/models.go $(MODELS_DIR)/enums.go
-MODEL_FILES := $(MODELS_DIR)/model_snail.go $(MODELS_DIR)/model_snailstat.go
+MODEL_FILES := $(MODELS_DIR)/model_snail.go $(MODELS_DIR)/model_player.go $(MODELS_DIR)/model_club.go
 
 .PHONY: image debug runImage publish
 
@@ -36,6 +36,7 @@ publishDebug: gcloudinit image
 gcloudinit: /tmp/gcloud.inited
 /tmp/gcloud.inited:
 	gcloud auth login
+# TODO: use a test SA, and setup a test project, with some kind of automated standup (TFORM? :( ). test project only nds a shell of data, secrets, iam, etc, no compute node
 	gcloud auth application-default login --impersonate-service-account walrus-sheet-access@prancingwalrus.iam.gserviceaccount.com
 	docker login us-central1-docker.pkg.dev
 	touch /tmp/gcloud.inited

@@ -111,12 +111,6 @@ TODO: consider Terraform :(
 * * select deploy container 
 ```
 us-central1-docker.pkg.dev/prancingwalrus/prancing-walrus/prancing-walrus:v0.01
-container env
-BOT_TOKEN
-<insert BOT_TOKEN here>
-APIKey
-<insert APIKey here>
 ```
-* * * TODO: secrets management yo?
 * * service account: walrus-sheet-access
 * * set custom metadata google-logging-enabled	true
