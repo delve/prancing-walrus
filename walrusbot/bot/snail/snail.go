@@ -1,6 +1,8 @@
 package snail
 
 import (
+	"strings"
+	"walrusbot/sheetDAO"
 	"walrusbot/utility/helpers"
 
 	"github.com/bwmarrin/discordgo"
@@ -10,8 +12,9 @@ import (
 type Snail struct{}
 
 var (
-	_ ken.SlashCommand = (*Snail)(nil)
-	_ ken.DmCapable    = (*Snail)(nil)
+	_ ken.SlashCommand        = (*Snail)(nil)
+	_ ken.DmCapable           = (*Snail)(nil)
+	_ ken.AutocompleteCommand = (*Snail)(nil)
 )
 
 func (c *Snail) Name() string {
@@ -61,10 +64,11 @@ func (c *Snail) Options() []*discordgo.ApplicationCommandOption {
 			Description: "Show the stats of one of your snails",
 			Options: []*discordgo.ApplicationCommandOption{
 				{
-					Type:        discordgo.ApplicationCommandOptionString,
-					Name:        "name",
-					Description: "Name of the snail you want to see",
-					Required:    true,
+					Type:         discordgo.ApplicationCommandOptionString,
+					Name:         "name",
+					Description:  "Name of the snail you want to see",
+					Required:     true,
+					Autocomplete: true,
 				},
 			},
 		},
@@ -101,6 +105,38 @@ func (c *Snail) Options() []*discordgo.ApplicationCommandOption {
 	}
 }
 
+func (c *Snail) Autocomplete(ctx *ken.AutocompleteContext) ([]*discordgo.ApplicationCommandOptionChoice, error) {
+	input, ok := ctx.SubCommand().GetInput("name")
+
+	if !ok {
+		return nil, nil
+	}
+	println(input)
+	player, err := sheetDAO.GetPlayerByDiscoId(ctx.User().Username)
+	if err != nil {
+		return nil, nil
+	}
+
+	snails, err := sheetDAO.GetSnails(player.PlayerID)
+	if err != nil {
+		return nil, nil
+	}
+
+	choices := make([]*discordgo.ApplicationCommandOptionChoice, 0, len(snails))
+	input = strings.ToLower(input)
+
+	for _, snail := range snails {
+		if strings.HasPrefix(strings.ToLower(snail.SnailName), input) {
+			choices = append(choices, &discordgo.ApplicationCommandOptionChoice{
+				Name:  snail.SnailName,
+				Value: snail.SnailName,
+			})
+		}
+	}
+
+	return choices, nil
+}
+
 func (c *Snail) Run(ctx ken.Context) (err error) {
 	err = ctx.HandleSubCommands(
 		ken.SubCommandHandler{Name: "add", Run: c.add},
@@ -134,10 +170,11 @@ func (c *Snail) update(ctx ken.SubCommandContext) (err error) {
 
 var snailStatsOptions = []*discordgo.ApplicationCommandOption{
 	{
-		Type:        discordgo.ApplicationCommandOptionString,
-		Name:        "name",
-		Description: "Name of the snail to update",
-		Required:    true,
+		Type:         discordgo.ApplicationCommandOptionString,
+		Name:         "name",
+		Description:  "Name of the snail to update",
+		Required:     true,
+		Autocomplete: true,
 	},
 	{
 		Type:        discordgo.ApplicationCommandOptionInteger,
