@@ -36,8 +36,7 @@ publishDebug: gcloudinit image
 gcloudinit: /tmp/gcloud.inited
 /tmp/gcloud.inited:
 	gcloud auth login
-# TODO: use a test SA, and setup a test project, with some kind of automated standup (TFORM? :( ). test project only nds a shell of data, secrets, iam, etc, no compute node
-	gcloud auth application-default login --impersonate-service-account walrus-sheet-access@prancingwalrus.iam.gserviceaccount.com
+	gcloud auth application-default login --impersonate-service-account test-walrus-sheet-access@testwalrus-425815.iam.gserviceaccount.com
 	docker login us-central1-docker.pkg.dev
 	touch /tmp/gcloud.inited
 
