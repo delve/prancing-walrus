@@ -1,9 +1,9 @@
 package assignment
 
 import (
+	"walrusbot/bot/middleware/beforeMiddleware"
 	"walrusbot/utility/config"
 	"walrusbot/utility/helpers"
-	"walrusbot/utility/log"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/zekrotja/ken"
@@ -12,8 +12,9 @@ import (
 type CalculateAssignment struct{}
 
 var (
-	_ ken.SlashCommand = (*CalculateAssignment)(nil)
-	_ ken.DmCapable    = (*CalculateAssignment)(nil)
+	_ ken.SlashCommand                 = (*CalculateAssignment)(nil)
+	_ ken.DmCapable                    = (*CalculateAssignment)(nil)
+	_ beforeMiddleware.RequiresOneRole = (*CalculateAssignment)(nil)
 )
 
 func (c *CalculateAssignment) Name() string {
@@ -40,20 +41,15 @@ func (c *CalculateAssignment) Options() []*discordgo.ApplicationCommandOption {
 	return []*discordgo.ApplicationCommandOption{}
 }
 
-func (c *CalculateAssignment) Run(ctx ken.Context) (err error) {
-	refreshRoleId, err := helpers.GetRoleId(ctx, config.Values.Roles["CanRefresh"])
-	if refreshRoleId == "" || err != nil {
-		log.Errorw("error finding role ID", "roleTag", "CanRefresh", "configuredRole", config.Values.Roles["CanRefresh"], "error", err)
-		return
-	}
+func (c *CalculateAssignment) AllowedRoles(ctx *ken.Ctx) (roles []string) {
+	roles = []string{config.Values.Roles["CanRefresh"]}
+	return
+}
 
-	if helpers.CheckRoleMembership(ctx, refreshRoleId) {
-		_ = ctx.Respond(helpers.GetDefaultResponse("Calculating kit assignments.", false, ctx))
-		calculateAssignments()
-		err = ctx.FollowUpMessage("Calculation complete").Send().Error
-	} else {
-		err = ctx.Respond(helpers.GetDefaultResponse("This command is not available to this user in this context.", true, ctx))
-	}
+func (c *CalculateAssignment) Run(ctx ken.Context) (err error) {
+	_ = ctx.Respond(helpers.GetDefaultResponse("Calculating kit assignments.", false, ctx))
+	calculateAssignments()
+	err = ctx.FollowUpMessage("Calculation complete").Send().Error
 
 	return
 }

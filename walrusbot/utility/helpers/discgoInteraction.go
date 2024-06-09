@@ -1,11 +1,9 @@
 package helpers
 
 import (
-	"fmt"
 	"strings"
 	"walrusbot/utility/log"
 
-	"github.com/FedorLap2006/disgolf"
 	"github.com/bwmarrin/discordgo"
 	"github.com/zekrotja/ken"
 )
@@ -45,28 +43,4 @@ func GetDefaultResponse(message string, ephemeral bool, ctx ken.Context) *discor
 		}
 	}
 
-}
-
-var handlerRecovery = func(ctx *disgolf.Ctx) {
-	if r := recover(); r != nil {
-		log.Errorw("Recovered panic in handler", "handler", ctx.Caller.Name, "user", ctx.Interaction.Member.User.Username, "error", r, "options", ctx.Options)
-	}
-}
-
-func HandlerWrapper(parentCmd string, ctx *disgolf.Ctx, behavior func(*disgolf.Ctx)) {
-	defer handlerRecovery(ctx)
-	thisChan, err := ctx.Channel(ctx.Interaction.ChannelID)
-	chanName := ""
-	if err != nil {
-		log.Errorw("Error retrieving channel from context in HandlerWrapper", "ctx", ctx, "channelId", ctx.Interaction.ChannelID)
-		chanName = "N/A"
-	} else {
-		chanName = thisChan.Name
-	}
-	command := ctx.Caller.Name
-	if len(parentCmd) > 0 {
-		command = fmt.Sprintf("%s %s", parentCmd, command)
-	}
-	log.Infow("In Handler", "command", command, "channel", chanName, "user", ctx.Interaction.Member.User.Username)
-	behavior(ctx)
 }
