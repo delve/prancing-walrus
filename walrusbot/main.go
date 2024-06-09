@@ -6,6 +6,7 @@ import (
 	"syscall"
 	"walrusbot/bot/assignment"
 	botcommands "walrusbot/bot/commands"
+	middlewares "walrusbot/bot/middleware"
 	"walrusbot/sheetDAO"
 	"walrusbot/utility/check"
 	"walrusbot/utility/config"
@@ -69,13 +70,11 @@ func main() {
 	check.Err(k.RegisterCommands(botcommands.Commands...))
 	defer k.Unregister()
 
+	check.Err(k.RegisterMiddlewares(middlewares.Middlewares...))
+
 	check.Err(session.Open())
 	defer session.Close()
 
-	// err = bot.Router.Sync(bot.Session, config.Values.AppId, config.Values.ServerId)
-	// if err != nil {
-	// 	log.Fatalw("cannot publish commands", "err", err)
-	// }
 	log.Infow("Bot is up!")
 
 	sigchan := make(chan os.Signal, 1)

@@ -111,7 +111,7 @@ func (c *Snail) Autocomplete(ctx *ken.AutocompleteContext) ([]*discordgo.Applica
 	if !ok {
 		return nil, nil
 	}
-	println(input)
+
 	player, err := sheetDAO.GetPlayerByDiscoId(ctx.User().Username)
 	if err != nil {
 		return nil, nil
