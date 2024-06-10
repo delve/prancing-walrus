@@ -1,6 +1,9 @@
 package club
 
 import (
+	"walrusbot/bot/middleware/beforeMiddleware"
+	"walrusbot/utility/helpers"
+
 	"github.com/bwmarrin/discordgo"
 	"github.com/zekrotja/ken"
 )
@@ -11,6 +14,8 @@ var (
 	_ ken.SlashCommand = (*Club)(nil)
 	_ ken.DmCapable    = (*Club)(nil)
 	// _ ken.AutocompleteCommand = (*Club)(nil)
+	_ beforeMiddleware.RequiresOneRole            = (*Club)(nil)
+	_ beforeMiddleware.AccessControlledSubcommand = (*Club)(nil)
 )
 
 func (c *Club) Name() string {
@@ -40,6 +45,15 @@ func (c *Club) Run(ctx ken.Context) (err error) {
 		ken.SubCommandHandler{Name: "kick", Run: c.snailKick},
 	)
 
+	return
+}
+
+func (c *Club) IsControlledSubcommand(ctx *ken.Ctx) bool {
+	return helpers.GetSubcommandFromCtx(ctx) != "members"
+}
+
+func (c *Club) AllowedRoles(ctx *ken.Ctx) (roles []string) {
+	//TODO: move role stuff here, looks the same for both kick and induct
 	return
 }
 
