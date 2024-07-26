@@ -41,7 +41,7 @@ var dataTabs = []rosterTab{
 		dataRange:   "A2:P",
 		key:         0},
 	{club: "You Shell Not Pass",
-		tabname:     "YSNP Roster",
+		tabname:     "ONO Roster",
 		headerRange: "A1:P1",
 		dataRange:   "A2:P",
 		key:         0},
