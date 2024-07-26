@@ -14,7 +14,8 @@ import (
 var IntegerOptionZeroValue = 0.0
 
 func GetRoleId(ctx ken.Context, roleName string) (string, error) {
-	for _, guildRole := range ctx.GetSession().State.Guilds[0].Roles {
+	guildRoles, _ := ctx.GetSession().GuildRoles(ctx.GetEvent().GuildID)
+	for _, guildRole := range guildRoles {
 		if guildRole.Name == roleName {
 			return guildRole.ID, nil
 		}
