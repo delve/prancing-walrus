@@ -9,6 +9,7 @@ import (
 	"walrusbot/utility/config"
 	"walrusbot/utility/log"
 
+	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
 )
@@ -142,8 +143,14 @@ func CacheAssignments() {
 
 	assignments = map[string]assignment{}
 
+	scopes := []string{
+		"https://www.googleapis.com/auth/spreadsheets.readonly",
+	}
+	jwtConfig, err := google.JWTConfigFromJSON(config.Values.Secrets.GetServiceAccountKey(), scopes...)
+	check.Err(err, "failed to create jwt config")
+
 	ctx := context.Background()
-	srv, err := sheets.NewService(ctx, option.WithAPIKey(config.Values.Secrets.GetSheetsApiKey()))
+	srv, err := sheets.NewService(ctx, option.WithHTTPClient(jwtConfig.Client(ctx)))
 	check.Err(err, "Unable to retrieve Sheets client")
 
 	spreadsheetId := config.Values.SheetId
