@@ -14,15 +14,15 @@ type CommandAccessControl struct{}
 
 // An AccessControlledSubcommand has a mixed set of subcommands where only some are access controlled.
 //
-//	IsControlledSubcommand must return true is the subcommand in ctx is controlled. See helpers.GetSubcommandFromCtx(ctx).
+//	IsControlledSubcommand must return true if the subcommand in ctx is controlled. See helpers.GetSubcommandFromCtx(ctx).
 //	Uncontrolled subcommands short circuit out of the access control middleware
 type AccessControlledSubcommand interface {
 	IsControlledSubcommand(*ken.Ctx) bool
 }
 
-// A RequiresAllRoles commande passes the access control middleware only if all required role are found on the user in ctx.
+// A RequiresAllRoles command passes the access control middleware only if all required role are found on the user in ctx.
 //
-//	This interface is processed first and additively to RequiresAllRoles. So you can have a hard requirement
+//	This interface is processed first and additively to RequiresOneRole. So you can have a hard requirement
 //	for a set of roles plus one more role from a semi-optional set.
 type RequiresAllRoles interface {
 	RequiredRoles(*ken.Ctx) []string
@@ -60,7 +60,7 @@ func (c *CommandAccessControl) Before(ctx *ken.Ctx) (next bool, err error) {
 		}
 	}
 
-	// Fallthrough, access restrictionsare satisfied or not required
+	// Fallthrough, access restrictions are satisfied or not required
 	return true, nil
 }
 

@@ -49,6 +49,7 @@ func getOfficerRoles(ctx ken.Context) (roles []*discordgo.Role) {
 }
 
 func GetOfficerRoleMemberships(ctx ken.Context) (memberships []*discordgo.Role) {
+	// TODO: does ken provide a function to get role name from id (that isn't just a range lookup)?
 	memberships = []*discordgo.Role{}
 	officerRoles := getOfficerRoles(ctx)
 	for _, role := range ctx.GetEvent().Member.Roles {
