@@ -15,7 +15,7 @@ I want to allow Discord users in a SS club to coordinate better during Species W
 
 With an API as described I could
 * Let players tell me their snail ID
-* Associate thier discord ID (which is unchangable, not their server) with the snail ID (which is also unchangeable AFAIK) in my database
+* Associate thier discord ID (which is unchangable, not their server nick) with the snail ID (which is also unchangeable AFAIK) in my database
 * Call the API to get their info
 * Cache that info in my database
 * Refresh that info automatically every week, just before SW starts
@@ -28,4 +28,5 @@ With an API as described I could
 
 # What controls do I intend to have in place
 * Rate limiting - acceptable rate TBD, but this will be a necessary control for both automated and on-demand refreshing
-* Snail validation - I'll need some way to ensure a Discord user is giving an ID for a snail they own. My intial thoughts here are having them tweak their stats in a spefici way. EG Prancing Walrus says "Make your sim power end in '77' then tell me to check." This isn't attack-proof but should be a reasonably high bar.
+* Snail ownership validation - I'll need some way to ensure a Discord user is giving an ID for a snail they own. My intial thoughts here are having them tweak their stats in a spefici way. EG Prancing Walrus says "Make your sim power end in '77' then tell me to check." This isn't attack-proof but should be a reasonably high bar. This still needs some additional thought
+* No direct access - Discord users will issue a bot command, Prancing Walrus will make all API calls
