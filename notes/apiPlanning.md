@@ -1,5 +1,5 @@
 # What do I need from a SS API
-I need an API that provide roughly this function:
+I need an API that provides roughly this function:
 * I can send it an arbitrary snail ID
 * I get back public stats for that snail, particularly
 * * Club membership
@@ -8,7 +8,7 @@ I need an API that provide roughly this function:
 * * Club offices (officer, mascot, etc)
 * * Any HARD or AFFCT stats
 
-TBH I don't remember exactly what information is available on other snails through the game interface, but I believe the first 3 are definitely available, and those are the only ones I'd *need*. Club rank would be super useful as well.
+TBH I don't remember exactly what information is available on other snails through the game interface, but I believe the first 3 are definitely available, and those are the only ones I'd *need*. Club offices would be super useful as well.
 
 # What do I want to do with it
 I want to allow Discord users in a SS club to coordinate better during Species War. Currently Prancing Walrus reads a spreadsheet maintained by humans and provides coordination on role and mining assignment, allowing a club to be more effective. The trouble is the manual sheet requires humans to do a lot of data gathering and entry.
