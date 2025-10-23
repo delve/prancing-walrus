@@ -26,6 +26,8 @@ resource "google_compute_instance" "walrus-1" {
 
   machine_type = "e2-micro"
 
+  # revoked API tokens inline. this file is out of date anyway and shouldn't be used.
+  # tokens are stored in GCP secret manager for runtime access.
   metadata = {
     gce-container-declaration = "spec:\n  containers:\n  - name: walrus-1\n    image: us-central1-docker.pkg.dev/prancingwalrus/prancing-walrus/prancing-walrus:v0.03\n    env:\n    - name: BOT_TOKEN\n      value: MTE2OTMzMjA4NDgxMzM0ODg2NQ.GzLVAi.LtbFRgtG7DPavXcfBVUNEugui5eDfj0c079-L4\n    - name: APIKey\n      value: AIzaSyCYHifpsoQfDgtFDJD590Z_KwProE7xvwM\n    stdin: false\n    tty: false\n  restartPolicy: Always\n# This container declaration format is not public API and may change without notice. Please\n# use gcloud command-line tool or Google Cloud Console to run Containers on Google Compute Engine."
   }
